@@ -1,96 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Righteous&family=Nunito:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* NAMQULA Design System - Namibian Language Learning App
+   Inspired by African sunsets, earthy tones, and vibrant cultural patterns */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Warm earthy background - like Namibian sand */
+    --background: 35 35% 97%;
+    --foreground: 20 40% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Cards with warm undertones */
+    --card: 40 40% 99%;
+    --card-foreground: 20 40% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 40 40% 99%;
+    --popover-foreground: 20 40% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary - Rich Terracotta/Sunset Orange */
+    --primary: 18 85% 55%;
+    --primary-foreground: 40 40% 99%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Warm Sand */
+    --secondary: 38 50% 90%;
+    --secondary-foreground: 20 40% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted - Soft beige */
+    --muted: 35 30% 92%;
+    --muted-foreground: 20 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent - Deep Burgundy/Maroon */
+    --accent: 350 60% 45%;
+    --accent-foreground: 40 40% 99%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Success - African Bush Green */
+    --success: 145 55% 42%;
+    --success-foreground: 40 40% 99%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Warning - Golden Ochre */
+    --warning: 42 90% 55%;
+    --warning-foreground: 20 40% 15%;
 
-    --radius: 0.5rem;
+    /* Destructive */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 40 40% 99%;
 
-    --sidebar-background: 0 0% 98%;
+    /* Borders and inputs */
+    --border: 35 25% 85%;
+    --input: 35 25% 88%;
+    --ring: 18 85% 55%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --radius: 1rem;
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Custom NAMQULA colors */
+    --sunset-orange: 18 85% 55%;
+    --sunset-gold: 38 90% 60%;
+    --sunset-pink: 350 70% 65%;
+    --earth-brown: 25 45% 30%;
+    --savanna-green: 85 35% 45%;
+    --sky-blue: 200 70% 55%;
+    --namibia-sand: 38 50% 85%;
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    /* Gradients */
+    --gradient-sunset: linear-gradient(135deg, hsl(18 85% 55%), hsl(350 70% 55%));
+    --gradient-golden: linear-gradient(135deg, hsl(38 90% 60%), hsl(18 85% 55%));
+    --gradient-earth: linear-gradient(180deg, hsl(35 35% 97%), hsl(38 50% 90%));
+    --gradient-hero: linear-gradient(180deg, hsl(18 85% 55% / 0.1), transparent);
 
-    --sidebar-accent: 240 4.8% 95.9%;
+    /* Shadows */
+    --shadow-soft: 0 4px 20px hsl(20 40% 15% / 0.08);
+    --shadow-card: 0 8px 30px hsl(20 40% 15% / 0.12);
+    --shadow-glow: 0 0 40px hsl(18 85% 55% / 0.25);
 
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Fonts */
+    --font-display: 'Righteous', cursive;
+    --font-body: 'Nunito', sans-serif;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 20 30% 8%;
+    --foreground: 38 30% 92%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 20 25% 12%;
+    --card-foreground: 38 30% 92%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 20 25% 12%;
+    --popover-foreground: 38 30% 92%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 18 80% 58%;
+    --primary-foreground: 20 30% 8%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 25 30% 20%;
+    --secondary-foreground: 38 30% 92%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 25 25% 18%;
+    --muted-foreground: 35 20% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 350 55% 50%;
+    --accent-foreground: 38 30% 92%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --success: 145 50% 45%;
+    --success-foreground: 20 30% 8%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --warning: 42 85% 55%;
+    --warning-foreground: 20 30% 8%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 38 30% 92%;
+
+    --border: 25 20% 22%;
+    --input: 25 20% 22%;
+    --ring: 18 80% 58%;
+
+    --shadow-soft: 0 4px 20px hsl(0 0% 0% / 0.3);
+    --shadow-card: 0 8px 30px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 40px hsl(18 80% 58% / 0.3);
   }
 }
 
@@ -99,7 +126,87 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground;
+  html {
+    font-family: var(--font-body);
   }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image: var(--gradient-earth);
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  .pattern-tribal {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30z' fill='none' stroke='%23d4a574' stroke-width='0.5' opacity='0.15'/%3E%3C/svg%3E");
+  }
+
+  .text-gradient-sunset {
+    background: var(--gradient-sunset);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-md border border-border/50;
+    box-shadow: var(--shadow-card);
+  }
+
+  .game-card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .game-card-hover:hover {
+    @apply -translate-y-2;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .celebration {
+    animation: celebrate 0.6s ease-out;
+  }
+
+  @keyframes celebrate {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.1) rotate(-3deg); }
+    50% { transform: scale(1.15); }
+    75% { transform: scale(1.1) rotate(3deg); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .float-animation {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(18 85% 55% / 0.3); }
+    50% { box-shadow: 0 0 40px hsl(18 85% 55% / 0.5); }
+  }
+
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.5s ease-out forwards;
+  }
+
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
 }
