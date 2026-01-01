@@ -282,6 +282,9 @@ export default function Index() {
               />
             </a>
           </div>
+          <p className="text-sm text-muted-foreground/50 mt-6">
+            © 2026 NAMQULA. All rights reserved.
+          </p>
         </div>
       </footer>
     </div>
