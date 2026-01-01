@@ -1,12 +1,13 @@
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, ChevronRight } from "lucide-react";
 
 interface GameCardProps {
   title: string;
   description: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
+  iconImage?: string; // Path to icon image
   difficulty: "Easy" | "Medium" | "Hard";
   onClick: () => void;
   color: "orange" | "pink" | "green" | "blue";
@@ -37,6 +38,7 @@ export function GameCard({
   title,
   description,
   icon: Icon,
+  iconImage,
   difficulty,
   onClick,
   color,
@@ -46,40 +48,50 @@ export function GameCard({
     <Card
       onClick={onClick}
       className={cn(
-        "relative overflow-hidden p-6 cursor-pointer transition-all duration-300",
+        "relative overflow-hidden p-6 md:p-8 cursor-pointer transition-all duration-200",
         "bg-gradient-to-br",
         colorClasses[color],
-        "border-2 border-transparent hover:border-primary/30",
+        "border-2 border-transparent hover:border-primary/30 active:border-primary/50",
+        "touch-card min-h-[200px] md:min-h-[220px]",
         "game-card-hover",
         className
       )}
     >
-      <div className="space-y-4">
+      <div className="space-y-5 h-full flex flex-col">
         {/* Icon and Badge */}
         <div className="flex items-start justify-between">
           <div className={cn(
-            "w-14 h-14 rounded-2xl flex items-center justify-center shadow-soft",
+            "w-24 h-24 md:w-32 md:h-32 rounded-2xl flex items-center justify-center shadow-soft overflow-hidden",
             iconColorClasses[color]
           )}>
-            <Icon className="w-7 h-7" />
+            {iconImage ? (
+              <img 
+                src={iconImage} 
+                alt={title}
+                className="w-full h-full object-contain p-1"
+              />
+            ) : Icon ? (
+              <Icon className="w-8 h-8 md:w-10 md:h-10" />
+            ) : null}
           </div>
-          <Badge className={cn("font-medium", difficultyColors[difficulty])}>
+          <Badge className={cn("font-semibold text-sm px-3 py-1", difficultyColors[difficulty])}>
             {difficulty}
           </Badge>
         </div>
 
         {/* Content */}
-        <div>
-          <h3 className="font-display text-xl text-foreground mb-2">{title}</h3>
-          <p className="text-muted-foreground text-sm leading-relaxed">
+        <div className="flex-1">
+          <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">{title}</h3>
+          <p className="text-muted-foreground text-base md:text-sm leading-relaxed">
             {description}
           </p>
         </div>
 
         {/* Play button hint */}
-        <div className="pt-2">
-          <span className="text-sm font-bold text-primary">
-            Play Now →
+        <div className="pt-3 border-t border-border/30">
+          <span className="text-base md:text-lg font-bold text-primary flex items-center gap-2">
+            Play Now
+            <ChevronRight className="w-5 h-5" />
           </span>
         </div>
       </div>

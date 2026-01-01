@@ -5,8 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { VocabularyItem, getRandomVocabulary } from "@/data/oshikwanyamaData";
-import { ArrowLeft, Trophy, Star, RefreshCw } from "lucide-react";
+import { ArrowLeft, Trophy, Star, RefreshCw, TrendingUp, Zap } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { getLevelConfig, getDifficultyColor, getDifficultyLabel } from "@/utils/gameUtils";
 
 interface WordMatchGameProps {
   onBack: () => void;
@@ -19,6 +20,8 @@ interface MatchPair {
 }
 
 export function WordMatchGame({ onBack }: WordMatchGameProps) {
+  const [level, setLevel] = useState(1);
+  const [totalScore, setTotalScore] = useState(0);
   const [pairs, setPairs] = useState<MatchPair[]>([]);
   const [englishWords, setEnglishWords] = useState<string[]>([]);
   const [oshiWords, setOshiWords] = useState<string[]>([]);
@@ -28,10 +31,12 @@ export function WordMatchGame({ onBack }: WordMatchGameProps) {
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [attempts, setAttempts] = useState(0);
-  const [gameComplete, setGameComplete] = useState(false);
+  const [levelComplete, setLevelComplete] = useState(false);
+
+  const levelConfig = getLevelConfig(level, 'wordmatch');
 
   const startGame = () => {
-    const vocab = getRandomVocabulary(6);
+    const vocab = getRandomVocabulary(levelConfig.wordCount);
     const gamePairs = vocab.map(v => ({
       id: v.id,
       english: v.english,
@@ -47,12 +52,13 @@ export function WordMatchGame({ onBack }: WordMatchGameProps) {
     setScore(0);
     setStreak(0);
     setAttempts(0);
-    setGameComplete(false);
+    setLevelComplete(false);
   };
 
   useEffect(() => {
     startGame();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [level]);
 
   useEffect(() => {
     if (selectedEnglish && selectedOshi) {
@@ -65,7 +71,7 @@ export function WordMatchGame({ onBack }: WordMatchGameProps) {
         const newMatched = new Set(matchedPairs);
         newMatched.add(pair.id);
         setMatchedPairs(newMatched);
-        setScore(prev => prev + (10 * (streak + 1)));
+        setScore(prev => prev + (levelConfig.pointsPerWord * (streak + 1)));
         setStreak(prev => prev + 1);
         
         toast({
@@ -75,7 +81,7 @@ export function WordMatchGame({ onBack }: WordMatchGameProps) {
         });
 
         if (newMatched.size === pairs.length) {
-          setGameComplete(true);
+          setLevelComplete(true);
         }
       } else {
         // Wrong match
@@ -93,7 +99,7 @@ export function WordMatchGame({ onBack }: WordMatchGameProps) {
         setSelectedOshi(null);
       }, 500);
     }
-  }, [selectedEnglish, selectedOshi]);
+  }, [selectedEnglish, selectedOshi, pairs, matchedPairs, streak, levelConfig.pointsPerWord]);
 
   const isEnglishMatched = (word: string) => {
     const pair = pairs.find(p => p.english === word);
@@ -105,10 +111,14 @@ export function WordMatchGame({ onBack }: WordMatchGameProps) {
     return pair ? matchedPairs.has(pair.id) : false;
   };
 
-  const progress = (matchedPairs.size / pairs.length) * 100;
+  const progress = pairs.length > 0 ? (matchedPairs.size / pairs.length) * 100 : 0;
 
-  if (gameComplete) {
-    const accuracy = Math.round((pairs.length / attempts) * 100);
+  // Level complete screen
+  if (levelComplete) {
+    const accuracy = attempts > 0 ? Math.round((pairs.length / attempts) * 100) : 100;
+    const levelBonus = levelConfig.bonusPoints;
+    const levelScore = score + levelBonus;
+    
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="max-w-md w-full p-8 text-center glass-card">
@@ -117,7 +127,7 @@ export function WordMatchGame({ onBack }: WordMatchGameProps) {
           </div>
           
           <h2 className="font-display text-3xl text-foreground mb-2">
-            Congratulations!
+            Level {level} Complete! 🎉
           </h2>
           <p className="text-muted-foreground mb-6">
             You matched all the words!
@@ -125,19 +135,41 @@ export function WordMatchGame({ onBack }: WordMatchGameProps) {
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="p-4 rounded-xl bg-secondary/50">
-              <p className="text-2xl font-bold text-foreground">{score}</p>
-              <p className="text-sm text-muted-foreground">Points</p>
+              <p className="text-2xl font-bold text-foreground">{levelScore}</p>
+              <p className="text-sm text-muted-foreground">Level Score</p>
             </div>
             <div className="p-4 rounded-xl bg-secondary/50">
-              <p className="text-2xl font-bold text-foreground">{accuracy}%</p>
+              <p className="text-2xl font-bold text-foreground">{totalScore + levelScore}</p>
+              <p className="text-sm text-muted-foreground">Total Score</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="p-4 rounded-xl bg-primary/10">
+              <p className="text-lg font-bold text-primary">{accuracy}%</p>
               <p className="text-sm text-muted-foreground">Accuracy</p>
+            </div>
+            <div className="p-4 rounded-xl bg-primary/10">
+              <p className="text-lg font-bold text-primary">+{levelBonus}</p>
+              <p className="text-sm text-muted-foreground">Bonus</p>
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <Button onClick={startGame} className="w-full">
+            <Button 
+              onClick={() => {
+                setLevel(prev => prev + 1);
+                setTotalScore(prev => prev + levelScore);
+              }} 
+              className="w-full" 
+              size="lg"
+            >
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Next Level ({level + 1})
+            </Button>
+            <Button variant="outline" onClick={startGame}>
               <RefreshCw className="w-4 h-4 mr-2" />
-              Play Again
+              Retry Level
             </Button>
             <Button variant="outline" onClick={onBack}>
               Back to Games
@@ -157,9 +189,16 @@ export function WordMatchGame({ onBack }: WordMatchGameProps) {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge className={cn("font-medium", getDifficultyColor(levelConfig.difficulty))}>
+              {getDifficultyLabel(levelConfig.difficulty)}
+            </Badge>
+            <Badge variant="outline" className="font-medium">
+              Level {level}
+            </Badge>
             <Badge variant="secondary" className="font-medium">
-              Score: {score}
+              <Zap className="w-3 h-3 mr-1" />
+              Total: {totalScore + score}
             </Badge>
             {streak > 1 && (
               <Badge className="bg-sunset-gold text-foreground animate-bounce-subtle">

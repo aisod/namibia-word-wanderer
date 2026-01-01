@@ -19,43 +19,48 @@ export default function LanguageIntro() {
       <header className="border-b border-border/30 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
-              <ArrowLeft className="w-5 h-5" />
+            <Button 
+              variant="ghost" 
+              size="lg"
+              onClick={() => navigate("/")}
+              className="min-h-[48px] min-w-[48px] p-2"
+            >
+              <ArrowLeft className="w-6 h-6 md:w-7 md:h-7" />
             </Button>
-            <Logo size="sm" />
+            <Logo size="lg" />
           </div>
-          <Button onClick={() => navigate(`/games/${languageId}`)}>
-            Start Learning
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="py-12 md:py-20">
-        <div className="container mx-auto px-4">
+      <section className="relative py-12 md:py-20 overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/oshiwambo.png)' }}
+        >
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
+        
+        <div className="relative z-10 container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-6 bg-primary/10 text-primary border-primary/20 px-4 py-1.5">
-              <Globe className="w-3.5 h-3.5 mr-2" />
-              Bantu Language Family
-            </Badge>
-            
-            <h1 className="font-display text-4xl md:text-6xl text-foreground mb-4">
+            <h1 className="font-display text-4xl md:text-6xl text-white mb-4 drop-shadow-lg">
               {languageInfo.name}
             </h1>
-            <p className="font-display text-2xl text-primary mb-8">
+            <p className="font-display text-2xl text-primary mb-8 drop-shadow-md">
               {languageInfo.nativeName}
             </p>
 
             {/* Quick Stats */}
             <div className="flex flex-wrap justify-center gap-6 mb-10">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50">
-                <Users className="w-5 h-5 text-primary" />
-                <span className="text-foreground font-medium">{languageInfo.speakers}</span>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
+                <Users className="w-5 h-5 text-white" />
+                <span className="text-white font-medium">{languageInfo.speakers}</span>
               </div>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50">
-                <MapPin className="w-5 h-5 text-accent" />
-                <span className="text-foreground font-medium">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
+                <MapPin className="w-5 h-5 text-white" />
+                <span className="text-white font-medium">
                   {languageInfo.regions.length} Regions
                 </span>
               </div>
@@ -177,11 +182,20 @@ export default function LanguageIntro() {
             </p>
             <Button 
               size="lg" 
-              className="text-lg px-10 h-14 bg-gradient-to-r from-primary to-accent hover:opacity-90"
+              className="relative text-base md:text-lg px-10 h-14 md:h-16 text-white hover:opacity-90 active:scale-95 transition-transform overflow-hidden border-2 border-white/30"
+              style={{
+                backgroundImage: 'url(/heroimage.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat'
+              }}
               onClick={() => navigate(`/games/${languageId}`)}
             >
-              Choose a Game
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <div className="absolute inset-0 bg-black/40" />
+              <span className="relative z-10 flex items-center">
+                Choose a Game
+                <ArrowRight className="w-5 h-5 md:w-6 md:h-6 ml-2" />
+              </span>
             </Button>
           </Card>
         </div>

@@ -23,7 +23,7 @@ export const oshikwanyamaInfo: LanguageInfo = {
   name: "Oshikwanyama",
   nativeName: "Oshiwambo",
   speakers: "Approximately 1+ million speakers",
-  regions: ["Cunene", "Ohangwena", "Omusati", "Oshikoto", "Oshana"],
+  regions: ["Kunene", "Ohangwena", "Omusati", "Oshikoto", "Oshana"],
   description: "Oshikwanyama (also called Oshiwambo) is a Bantu language belonging to the larger Niger-Congo Phylum. It is spoken in both Namibia and Angola, making it a truly cross-border language that unites communities across national boundaries.",
   history: "The Owambo people have a rich cultural heritage spanning centuries. Oshiwambo has evolved while maintaining its core structure, incorporating some loanwords from colonial languages while preserving its grammatical integrity. The language is read as it is written - making it relatively accessible for learners who master the phonetic system.",
   funFacts: [

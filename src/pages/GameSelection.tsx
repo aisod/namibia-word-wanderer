@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/ui/Logo";
 import { GameCard } from "@/components/GameCard";
 import { FlashcardGame } from "@/components/FlashcardGame";
 import { WordMatchGame } from "@/components/WordMatchGame";
 import { QuizGame } from "@/components/QuizGame";
-import { ArrowLeft, CreditCard, Puzzle, HelpCircle, Sparkles } from "lucide-react";
+import { WordSearchGame } from "@/components/WordSearchGame";
+import { ArrowLeft } from "lucide-react";
 
-type GameType = "flashcards" | "wordmatch" | "quiz" | null;
+type GameType = "flashcards" | "wordmatch" | "quiz" | "wordsearch" | null;
 
 export default function GameSelection() {
   const navigate = useNavigate();
@@ -25,45 +25,49 @@ export default function GameSelection() {
   if (activeGame === "quiz") {
     return <QuizGame onBack={() => setActiveGame(null)} />;
   }
+  if (activeGame === "wordsearch") {
+    return <WordSearchGame onBack={() => setActiveGame(null)} />;
+  }
 
   return (
-    <div className="min-h-screen pattern-tribal">
-      {/* Header */}
-      <header className="border-b border-border/30 bg-card/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate(`/language/${languageId}`)}>
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <Logo size="sm" />
-          </div>
+    <div className="min-h-screen">
+      {/* Content with Hero Background */}
+      <section className="relative min-h-screen py-12 md:py-20">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/heroimage.jpg)' }}
+        >
+          <div className="absolute inset-0 bg-black/50" />
         </div>
-      </header>
 
-      {/* Content */}
-      <section className="py-12 md:py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
-                <Sparkles className="w-4 h-4" />
-                <span className="font-medium">Oshikwanyama</span>
-              </div>
-              <h1 className="font-display text-3xl md:text-5xl text-foreground mb-4">
-                Choose Your Game
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-                Select a game mode to start learning vocabulary in a fun and interactive way
-              </p>
+        <div className="relative z-10 container mx-auto px-4">
+          {/* Header */}
+          <header className="sticky top-0 z-50 mb-8 md:mb-12 bg-black/30 backdrop-blur-md rounded-b-2xl border-b border-white/20">
+            <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+              <Button 
+                variant="ghost" 
+                size="lg"
+                onClick={() => navigate(`/language/${languageId}`)} 
+                className="text-white hover:bg-white/20 min-h-[48px] min-w-[48px] p-2"
+              >
+                <ArrowLeft className="w-6 h-6 md:w-7 md:h-7" />
+              </Button>
+              <h2 className="font-display text-xl md:text-2xl lg:text-3xl text-white drop-shadow-lg text-center flex-1">
+                Browse our collections of games
+              </h2>
+              <div className="w-[48px]"></div>
             </div>
+          </header>
+
+          <div className="max-w-4xl mx-auto">
 
             {/* Game Cards */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               <GameCard
                 title="Flashcards"
                 description="Learn vocabulary at your own pace with interactive flashcards. Flip to reveal translations!"
-                icon={CreditCard}
+                iconImage="/flashcards.png"
                 difficulty="Easy"
                 color="orange"
                 onClick={() => setActiveGame("flashcards")}
@@ -72,7 +76,7 @@ export default function GameSelection() {
               <GameCard
                 title="Word Match"
                 description="Test your memory by matching English words with their Oshikwanyama translations."
-                icon={Puzzle}
+                iconImage="/wordmatch.png"
                 difficulty="Medium"
                 color="pink"
                 onClick={() => setActiveGame("wordmatch")}
@@ -81,20 +85,30 @@ export default function GameSelection() {
               <GameCard
                 title="Quiz Challenge"
                 description="Put your knowledge to the test! Answer questions before you run out of lives."
-                icon={HelpCircle}
+                iconImage="/quizchallenge.png"
                 difficulty="Hard"
                 color="green"
                 onClick={() => setActiveGame("quiz")}
               />
+
+              <GameCard
+                title="Word Search"
+                description="Find hidden words in a grid of letters. Click letters in sequence to form words!"
+                iconImage="/wordsearch.png"
+                difficulty="Medium"
+                color="blue"
+                onClick={() => setActiveGame("wordsearch")}
+              />
             </div>
 
             {/* Tips */}
-            <div className="mt-12 p-6 rounded-2xl bg-secondary/30 border border-border/50">
-              <h3 className="font-display text-lg text-foreground mb-3">💡 Learning Tips</h3>
-              <ul className="space-y-2 text-muted-foreground text-sm">
-                <li>• Start with <strong>Flashcards</strong> to familiarize yourself with new words</li>
-                <li>• Move to <strong>Word Match</strong> to test your recognition skills</li>
-                <li>• Challenge yourself with the <strong>Quiz</strong> when you're feeling confident!</li>
+            <div className="mt-12 p-6 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+              <h3 className="font-display text-lg text-white mb-3 drop-shadow-md">💡 Learning Tips</h3>
+              <ul className="space-y-2 text-white/90 text-sm drop-shadow-sm">
+                <li>• Start with <strong className="text-white">Flashcards</strong> to familiarize yourself with new words</li>
+                <li>• Try <strong className="text-white">Word Search</strong> to find words in a fun grid challenge</li>
+                <li>• Move to <strong className="text-white">Word Match</strong> to test your recognition skills</li>
+                <li>• Challenge yourself with the <strong className="text-white">Quiz</strong> when you're feeling confident!</li>
               </ul>
             </div>
           </div>

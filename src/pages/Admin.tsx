@@ -93,10 +93,15 @@ export default function Admin() {
       <header className="border-b border-border/30 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
-              <ArrowLeft className="w-5 h-5" />
+            <Button 
+              variant="ghost" 
+              size="lg"
+              onClick={() => navigate("/")}
+              className="min-h-[48px] min-w-[48px] p-2"
+            >
+              <ArrowLeft className="w-6 h-6 md:w-7 md:h-7" />
             </Button>
-            <Logo size="sm" />
+            <Logo size="lg" />
             <Badge variant="outline" className="ml-2">Admin Panel</Badge>
           </div>
         </div>

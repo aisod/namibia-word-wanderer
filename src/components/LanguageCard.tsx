@@ -9,6 +9,7 @@ interface LanguageCardProps {
   speakers: string;
   regions: string[];
   flag?: string;
+  coverImage?: string;
   onClick: () => void;
   isAvailable?: boolean;
   className?: string;
@@ -19,6 +20,7 @@ export function LanguageCard({
   nativeName,
   speakers,
   regions,
+  coverImage,
   onClick,
   isAvailable = true,
   className,
@@ -27,16 +29,31 @@ export function LanguageCard({
     <Card
       onClick={isAvailable ? onClick : undefined}
       className={cn(
-        "relative overflow-hidden p-6 transition-all duration-300 cursor-pointer",
+        "relative overflow-hidden p-6 md:p-8 transition-all duration-200 cursor-pointer",
         "border-2 border-transparent",
-        "bg-gradient-to-br from-card to-secondary/30",
-        isAvailable && "game-card-hover hover:border-primary/50",
+        "min-h-[180px] md:min-h-[200px]",
+        "touch-card",
+        !coverImage && "bg-gradient-to-br from-card to-secondary/30",
+        isAvailable && "game-card-hover hover:border-primary/50 active:scale-[0.98]",
         !isAvailable && "opacity-60 cursor-not-allowed",
         className
       )}
+      style={coverImage ? {
+        backgroundImage: `url(${coverImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      } : undefined}
     >
-      {/* Decorative pattern */}
-      <div className="absolute top-0 right-0 w-32 h-32 opacity-10 pattern-tribal" />
+      {/* Background overlay for readability */}
+      {coverImage && (
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+      )}
+      
+      {/* Decorative pattern (only if no cover image) */}
+      {!coverImage && (
+        <div className="absolute top-0 right-0 w-32 h-32 opacity-10 pattern-tribal" />
+      )}
       
       {/* Coming soon badge */}
       {!isAvailable && (
@@ -45,30 +62,68 @@ export function LanguageCard({
         </Badge>
       )}
 
-      <div className="relative z-10 space-y-4">
+      <div className={cn(
+        "relative z-10 space-y-5",
+        coverImage && "text-white"
+      )}>
         {/* Language name */}
         <div>
-          <h3 className="font-display text-2xl text-foreground">{name}</h3>
-          <p className="text-muted-foreground font-medium">{nativeName}</p>
+          <h3 className={cn(
+            "font-display text-2xl md:text-3xl mb-1",
+            coverImage ? "text-white drop-shadow-lg" : "text-foreground"
+          )}>
+            {name}
+          </h3>
+          <p className={cn(
+            "font-medium text-base md:text-lg",
+            coverImage ? "text-white/90 drop-shadow-md" : "text-muted-foreground"
+          )}>
+            {nativeName}
+          </p>
         </div>
 
         {/* Stats */}
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Users className="w-4 h-4 text-primary" />
-            <span>{speakers}</span>
+        <div className="space-y-3 text-sm md:text-base">
+          <div className={cn(
+            "flex items-center gap-3",
+            coverImage ? "text-white/90" : "text-muted-foreground"
+          )}>
+            <Users className={cn(
+              "w-5 h-5 flex-shrink-0",
+              coverImage ? "text-white" : "text-primary"
+            )} />
+            <span className={coverImage ? "drop-shadow-md" : ""}>{speakers}</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <MapPin className="w-4 h-4 text-accent" />
-            <span>{regions.slice(0, 2).join(", ")}{regions.length > 2 && "..."}</span>
+          <div className={cn(
+            "flex items-center gap-3",
+            coverImage ? "text-white/90" : "text-muted-foreground"
+          )}>
+            <MapPin className={cn(
+              "w-5 h-5 flex-shrink-0",
+              coverImage ? "text-white" : "text-accent"
+            )} />
+            <span className={coverImage ? "drop-shadow-md" : ""}>
+              {regions.slice(0, 2).join(", ")}{regions.length > 2 && "..."}
+            </span>
           </div>
         </div>
 
         {/* Action indicator */}
         {isAvailable && (
-          <div className="flex items-center justify-between pt-2">
-            <span className="text-sm font-semibold text-primary">Start Learning</span>
-            <ChevronRight className="w-5 h-5 text-primary" />
+          <div className={cn(
+            "flex items-center justify-between pt-3",
+            coverImage ? "border-t border-white/30" : "border-t border-border/50"
+          )}>
+            <span className={cn(
+              "text-base md:text-lg font-bold",
+              coverImage ? "text-white drop-shadow-lg" : "text-primary"
+            )}>
+              Start Learning
+            </span>
+            <ChevronRight className={cn(
+              "w-6 h-6",
+              coverImage ? "text-white drop-shadow-lg" : "text-primary"
+            )} />
           </div>
         )}
       </div>

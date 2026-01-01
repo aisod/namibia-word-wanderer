@@ -124,20 +124,43 @@
 @layer base {
   * {
     @apply border-border;
+    /* Improve touch scrolling on iOS */
+    -webkit-tap-highlight-color: transparent;
   }
 
   html {
     font-family: var(--font-body);
+    /* Smooth scrolling for better UX */
+    scroll-behavior: smooth;
+    /* Prevent text size adjustment on iOS */
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     background-image: var(--gradient-earth);
     min-height: 100vh;
+    /* Better touch handling */
+    touch-action: manipulation;
+    /* Safe area for notched devices */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
+  }
+
+  /* Better button/clickable element touch targets */
+  button, a, [role="button"], [tabindex="0"] {
+    /* Minimum touch target size (44x44px recommended by Apple/Google) */
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Improve text selection */
+  ::selection {
+    background-color: hsl(var(--primary) / 0.2);
+    color: hsl(var(--foreground));
   }
 }
 
@@ -160,11 +183,32 @@
 
   .game-card-hover {
     @apply transition-all duration-300 ease-out;
+    /* Better touch feedback */
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .game-card-hover:hover {
-    @apply -translate-y-2;
+  .game-card-hover:hover,
+  .game-card-hover:active {
+    @apply -translate-y-1 scale-[0.98];
     box-shadow: var(--shadow-glow);
+  }
+
+  /* Active state for touch devices */
+  .game-card-hover:active {
+    @apply scale-[0.97];
+    transition: transform 0.1s ease-out;
+  }
+
+  /* Touch-friendly card */
+  .touch-card {
+    @apply transition-all duration-200 ease-out;
+    min-height: 140px;
+    padding: 1.5rem;
+  }
+
+  .touch-card:active {
+    @apply scale-[0.97];
+    transform-origin: center;
   }
 
   .celebration {
@@ -209,4 +253,48 @@
   .stagger-2 { animation-delay: 0.2s; }
   .stagger-3 { animation-delay: 0.3s; }
   .stagger-4 { animation-delay: 0.4s; }
+
+  /* App-like container */
+  .app-container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .app-container {
+      max-width: 640px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .app-container {
+      max-width: 768px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .app-container {
+      max-width: 1024px;
+    }
+  }
+
+  /* Touch-friendly button styles */
+  .btn-touch {
+    @apply min-h-[48px] px-6 py-3 text-base font-semibold;
+    @apply transition-all duration-200 ease-out;
+    @apply active:scale-95;
+  }
+
+  /* Improved spacing for mobile */
+  .mobile-spacing {
+    @apply px-4 py-6;
+  }
+
+  @media (min-width: 768px) {
+    .mobile-spacing {
+      @apply px-6 py-8;
+    }
+  }
 }

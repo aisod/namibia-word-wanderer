@@ -1,23 +1,54 @@
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface LogoProps {
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
   className?: string;
+  showText?: boolean;
+  clickable?: boolean;
 }
 
 const sizeClasses = {
-  sm: "text-xl",
-  md: "text-3xl",
-  lg: "text-5xl",
-  xl: "text-7xl",
+  sm: "h-8 w-auto",
+  md: "h-12 w-auto",
+  lg: "h-16 w-auto",
+  xl: "h-24 w-auto",
+  "2xl": "h-32 w-auto md:h-40",
+  "3xl": "h-40 w-auto md:h-48",
+  "4xl": "h-48 w-auto md:h-56 lg:h-64",
 };
 
-export function Logo({ size = "md", className }: LogoProps) {
+const textSizeClasses = {
+  sm: "text-xl",
+  md: "text-2xl",
+  lg: "text-4xl",
+  xl: "text-6xl",
+};
+
+export function Logo({ size = "md", className, showText = false, clickable = true }: LogoProps) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (clickable) {
+      navigate("/");
+    }
+  };
+
   return (
-    <div className={cn("font-display flex items-center gap-2", className)}>
-      <span className={cn("text-gradient-sunset", sizeClasses[size])}>
-        NAMQULA
-      </span>
+    <div 
+      className={cn("flex items-center gap-3", clickable && "cursor-pointer transition-opacity hover:opacity-80", className)}
+      onClick={handleClick}
+    >
+      <img 
+        src="/logo.png" 
+        alt="NAMQULA Logo" 
+        className={cn(sizeClasses[size], "object-contain")}
+      />
+      {showText && (
+        <span className={cn("font-display text-gradient-sunset", textSizeClasses[size])}>
+          NAMQULA
+        </span>
+      )}
     </div>
   );
 }
