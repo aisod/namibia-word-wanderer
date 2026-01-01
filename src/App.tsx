@@ -7,7 +7,6 @@ import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import LanguageIntro from "./pages/LanguageIntro";
 import GameSelection from "./pages/GameSelection";
-import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,7 +22,6 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/language/:languageId" element={<LanguageIntro />} />
           <Route path="/games/:languageId" element={<GameSelection />} />
-          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

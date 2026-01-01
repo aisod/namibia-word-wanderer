@@ -1,10 +1,8 @@
-import { useState } from "react";
 import { Logo } from "@/components/ui/Logo";
 import { LanguageCard } from "@/components/LanguageCard";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { oshikwanyamaInfo } from "@/data/oshikwanyamaData";
-import { Globe, Sparkles, BookOpen, Gamepad2, Users, MapPin, ChevronRight, Settings } from "lucide-react";
+import { Globe, Sparkles, BookOpen, Gamepad2, Users, MapPin, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function Index() {
@@ -24,18 +22,9 @@ export default function Index() {
         </div>
         
         <div className="relative z-10 container mx-auto px-4">
-          {/* Nav - Logo and Admin */}
-          <nav className="flex items-center justify-between mb-8 md:mb-10">
+          {/* Nav - Logo */}
+          <nav className="flex items-center justify-center mb-8 md:mb-10">
             <Logo size="2xl" showText={false} clickable={true} />
-            <Button 
-              variant="ghost" 
-              size="lg" 
-              className="min-h-[44px] px-4 md:px-6"
-              onClick={() => navigate("/admin")}
-            >
-              <Settings className="w-5 h-5 mr-2" />
-              <span className="hidden sm:inline">Admin</span>
-            </Button>
           </nav>
 
           {/* Hero Content - NAMQULA Information */}
@@ -251,6 +240,17 @@ export default function Index() {
                 </div>
                 <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">Joel Tiago</h3>
                 <p className="text-base text-muted-foreground mb-3">Technologist & CEO</p>
+                <p className="text-base text-muted-foreground/80">
+                  AISOD
+                </p>
+              </div>
+
+              <div className="text-center p-8 md:p-10 rounded-2xl bg-card border border-border/50 shadow-sm">
+                <div className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-display text-3xl md:text-4xl">
+                  ES
+                </div>
+                <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">Edna Silva</h3>
+                <p className="text-base text-muted-foreground mb-3">Software Developer</p>
                 <p className="text-base text-muted-foreground/80">
                   AISOD
                 </p>

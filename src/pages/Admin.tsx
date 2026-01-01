@@ -315,7 +315,7 @@ export default function Admin() {
               <div>
                 <h3 className="font-semibold text-foreground">Bulk Upload Coming Soon</h3>
                 <p className="text-sm text-muted-foreground">
-                  Upload CSV or document files to add vocabulary in bulk. Connect Lovable Cloud to enable database persistence.
+                  Upload CSV or document files to add vocabulary in bulk. Database persistence coming soon.
                 </p>
               </div>
             </div>
