@@ -203,8 +203,12 @@ export default function Index() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {/* Team Member Cards */}
               <div className="text-center p-8 md:p-10 rounded-2xl bg-card border border-border/50 shadow-sm">
-                <div className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-display text-3xl md:text-4xl">
-                  TV
+                <div className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-full overflow-hidden border-4 border-border/30 shadow-lg">
+                  <img 
+                    src="/mbongue.jpeg" 
+                    alt="Mbongue Lucas Shuukifeni"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">Mbongue Lucas Shuukifeni</h3>
                 <p className="text-base text-muted-foreground mb-3">
@@ -246,8 +250,12 @@ export default function Index() {
               </div>
 
               <div className="text-center p-8 md:p-10 rounded-2xl bg-card border border-border/50 shadow-sm">
-                <div className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-display text-3xl md:text-4xl">
-                  ES
+                <div className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-full overflow-hidden border-4 border-border/30 shadow-lg">
+                  <img 
+                    src="/Edna.avif" 
+                    alt="Edna Silva"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">Edna Silva</h3>
                 <p className="text-base text-muted-foreground mb-3">Software Developer</p>
