@@ -1,8 +1,9 @@
 import { Logo } from "@/components/ui/Logo";
 import { LanguageCard } from "@/components/LanguageCard";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { oshikwanyamaInfo } from "@/data/oshikwanyamaData";
-import { Globe, Sparkles, BookOpen, Gamepad2, Users, MapPin, ChevronRight } from "lucide-react";
+import { Globe, Sparkles, BookOpen, Gamepad2, Users, MapPin, ChevronRight, Users as UsersIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function Index() {
@@ -22,9 +23,21 @@ export default function Index() {
         </div>
         
         <div className="relative z-10 container mx-auto px-4">
-          {/* Nav - Logo */}
-          <nav className="flex items-center justify-center mb-8 md:mb-10">
+          {/* Nav - Logo and Join */}
+          <nav className="flex items-center justify-between mb-8 md:mb-10">
+            <div className="flex-1"></div>
             <Logo size="2xl" showText={false} clickable={true} />
+            <div className="flex-1 flex justify-end">
+              <Button 
+                variant="ghost" 
+                size="lg" 
+                className="min-h-[44px] px-4 md:px-6 text-white hover:text-white hover:bg-white/10"
+                onClick={() => navigate("/community")}
+              >
+                <UsersIcon className="w-5 h-5 mr-2" />
+                <span className="hidden sm:inline">Join</span>
+              </Button>
+            </div>
           </nav>
 
           {/* Hero Content - NAMQULA Information */}
