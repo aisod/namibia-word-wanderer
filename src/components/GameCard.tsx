@@ -15,17 +15,17 @@ interface GameCardProps {
 }
 
 const colorClasses = {
-  orange: "from-sunset-orange/20 to-sunset-gold/10 hover:from-sunset-orange/30 hover:to-sunset-gold/20",
-  pink: "from-sunset-pink/20 to-accent/10 hover:from-sunset-pink/30 hover:to-accent/20",
-  green: "from-success/20 to-savanna-green/10 hover:from-success/30 hover:to-savanna-green/20",
-  blue: "from-sky-blue/20 to-primary/10 hover:from-sky-blue/30 hover:to-primary/20",
+  orange: "from-neon-orange/10 to-neon-yellow/10 hover:from-neon-orange/20 hover:to-neon-yellow/20",
+  pink: "from-neon-pink/10 to-accent/10 hover:from-neon-pink/20 hover:to-accent/20",
+  green: "from-neon-green/10 to-success/10 hover:from-neon-green/20 hover:to-success/20",
+  blue: "from-neon-cyan/10 to-primary/10 hover:from-neon-cyan/20 hover:to-primary/20",
 };
 
 const iconColorClasses = {
-  orange: "bg-sunset-orange text-primary-foreground",
-  pink: "bg-sunset-pink text-primary-foreground",
-  green: "bg-success text-success-foreground",
-  blue: "bg-sky-blue text-primary-foreground",
+  orange: "bg-gradient-to-br from-neon-orange to-neon-yellow text-primary-foreground",
+  pink: "bg-gradient-to-br from-neon-pink to-accent text-primary-foreground",
+  green: "bg-gradient-to-br from-neon-green to-success text-primary-foreground",
+  blue: "bg-gradient-to-br from-neon-cyan to-primary text-primary-foreground",
 };
 
 const difficultyColors = {
@@ -48,12 +48,12 @@ export function GameCard({
     <Card
       onClick={onClick}
       className={cn(
-        "relative overflow-hidden p-6 md:p-8 cursor-pointer transition-all duration-200",
+        "relative overflow-hidden p-6 md:p-8 cursor-pointer",
         "bg-gradient-to-br",
         colorClasses[color],
-        "border-2 border-transparent hover:border-primary/30 active:border-primary/50",
-        "touch-card min-h-[200px] md:min-h-[220px]",
-        "game-card-hover",
+        "border-2 border-transparent hover:border-primary/50 active:border-primary/80",
+        "app-card min-h-[200px] md:min-h-[220px]",
+        "animate-bounce-in",
         className
       )}
     >

@@ -29,12 +29,11 @@ export function LanguageCard({
     <Card
       onClick={isAvailable ? onClick : undefined}
       className={cn(
-        "relative overflow-hidden p-6 md:p-8 transition-all duration-200 cursor-pointer",
+        "relative overflow-hidden p-6 md:p-8 transition-all duration-300 cursor-pointer",
         "border-2 border-transparent",
         "min-h-[180px] md:min-h-[200px]",
-        "touch-card",
         !coverImage && "bg-gradient-to-br from-card to-secondary/30",
-        isAvailable && "game-card-hover hover:border-primary/50 active:scale-[0.98]",
+        isAvailable && "app-card animate-bounce-in hover:border-primary/60 active:scale-[0.97]",
         !isAvailable && "opacity-60 cursor-not-allowed",
         className
       )}

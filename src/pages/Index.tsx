@@ -2,6 +2,9 @@ import { Logo } from "@/components/ui/Logo";
 import { LanguageCard } from "@/components/LanguageCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ParticleBackground } from "@/components/ParticleBackground";
+import { ProgressIndicator } from "@/components/ProgressIndicator";
+import { AchievementBadge } from "@/components/AchievementBadge";
 import { oshikwanyamaInfo } from "@/data/oshikwanyamaData";
 import { Globe, Sparkles, BookOpen, Gamepad2, Users, MapPin, ChevronRight, Users as UsersIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -10,16 +13,23 @@ export default function Index() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen pattern-tribal">
+    <div className="min-h-screen pattern-tribal relative">
+      <ParticleBackground particleCount={30} />
       {/* Hero Section */}
       <header className="relative overflow-hidden py-8 md:py-12 lg:py-16">
         {/* Background Image */}
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: 'url(/heroimage.jpg)' }}
         >
-          {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 bg-black/50" />
+          {/* Dark overlay with neon gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/80" />
+          {/* Animated neon particles */}
+          <div className="absolute inset-0 opacity-30">
+            <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-primary rounded-full animate-glow-pulse" />
+            <div className="absolute top-3/4 right-1/4 w-1 h-1 bg-accent rounded-full animate-glow-pulse" style={{animationDelay: '1s'}} />
+            <div className="absolute top-1/2 right-1/3 w-1.5 h-1.5 bg-success rounded-full animate-glow-pulse" style={{animationDelay: '2s'}} />
+          </div>
         </div>
         
         <div className="relative z-10 container mx-auto px-4">
@@ -63,7 +73,7 @@ export default function Index() {
 
             <div className="flex flex-col items-center justify-center mt-8">
               <button
-                className="cursor-pointer hover:opacity-90 active:scale-95 transition-all duration-200 mb-3"
+                className="cursor-pointer hover:opacity-90 active:scale-95 transition-all duration-200 mb-3 group"
                 onClick={() => {
                   // Scroll to languages section
                   const languagesSection = document.getElementById('languages-section');
@@ -72,11 +82,14 @@ export default function Index() {
                   }
                 }}
               >
-                <img 
-                  src="/playbutton.png" 
-                  alt="Play button"
-                  className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain"
-                />
+                <div className="relative">
+                  <img
+                    src="/playbutton.png"
+                    alt="Play button"
+                    className="w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 object-contain group-hover:animate-float-gentle"
+                  />
+                  <div className="absolute inset-0 rounded-full bg-primary/20 animate-glow-pulse group-hover:bg-primary/40 transition-colors duration-300" />
+                </div>
               </button>
               <p className="text-white text-base md:text-lg font-medium drop-shadow-md">
                 Play Now
@@ -84,19 +97,44 @@ export default function Index() {
             </div>
           </div>
 
-          {/* Stats */}
+          {/* Stats & Progress */}
           <div className="flex flex-wrap justify-center gap-6 md:gap-8 mt-12 md:mt-16">
             {[
-              { icon: Globe, label: "Languages", value: "1+" },
-              { icon: BookOpen, label: "Words", value: "100+" },
-              { icon: Gamepad2, label: "Games", value: "4" },
+              { icon: Globe, label: "Languages", value: "1+", progress: 1, max: 3 },
+              { icon: BookOpen, label: "Words", value: "100+", progress: 100, max: 500 },
+              { icon: Gamepad2, label: "Games", value: "4", progress: 4, max: 8 },
             ].map((stat) => (
-              <div key={stat.label} className="flex items-center gap-3 text-white/90 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
-                <stat.icon className="w-5 h-5 md:w-6 md:h-6 text-white flex-shrink-0" />
+              <div key={stat.label} className="flex flex-col items-center gap-3 text-white/90 px-6 py-4 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 min-w-[120px]">
+                <stat.icon className="w-6 h-6 md:w-7 md:h-7 text-white flex-shrink-0" />
                 <span className="font-display text-2xl md:text-3xl text-white">{stat.value}</span>
-                <span className="text-sm md:text-base text-white/90">{stat.label}</span>
+                <span className="text-sm md:text-base text-white/90 text-center">{stat.label}</span>
+                <ProgressIndicator current={stat.progress!} total={stat.max!} size="sm" showNumbers={false} />
               </div>
             ))}
+          </div>
+
+          {/* Achievement Preview */}
+          <div className="mt-8 md:mt-12">
+            <div className="flex flex-wrap justify-center gap-4">
+              <AchievementBadge
+                title="First Steps"
+                description="Started learning Oshikwanyama"
+                icon="star"
+                earned={true}
+              />
+              <AchievementBadge
+                title="Word Master"
+                description="Found 50 words in word search"
+                icon="target"
+                earned={false}
+              />
+              <AchievementBadge
+                title="Game Champion"
+                description="Completed all games"
+                icon="trophy"
+                earned={false}
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -215,13 +253,18 @@ export default function Index() {
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {/* Team Member Cards */}
-              <div className="text-center p-8 md:p-10 rounded-2xl bg-card border border-border/50 shadow-sm">
-                <div className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-full overflow-hidden border-4 border-border/30 shadow-lg">
-                  <img 
-                    src="/mbongue.jpeg" 
-                    alt="Mbongue Lucas Shuukifeni"
-                    className="w-full h-full object-cover"
-                  />
+              <div className="text-center p-8 md:p-10 rounded-2xl app-card transform hover:scale-105 transition-all duration-300">
+                <div className="relative mb-6">
+                  <div className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden border-4 border-primary/30 shadow-lg animate-float-gentle">
+                    <img
+                      src="/mbongue.jpeg"
+                      alt="Mbongue Lucas Shuukifeni"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center animate-glow-pulse">
+                    <Sparkles className="w-4 h-4 text-primary-foreground" />
+                  </div>
                 </div>
                 <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">Mbongue Lucas Shuukifeni</h3>
                 <p className="text-base text-muted-foreground mb-3">
@@ -232,13 +275,18 @@ export default function Index() {
                 </p>
               </div>
 
-              <div className="text-center p-8 md:p-10 rounded-2xl bg-card border border-border/50 shadow-sm">
-                <div className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-full overflow-hidden border-4 border-border/30 shadow-lg">
-                  <img 
-                    src="/MASAMBO.jpg" 
-                    alt="Johannes Masambo"
-                    className="w-full h-full object-cover"
-                  />
+              <div className="text-center p-8 md:p-10 rounded-2xl app-card transform hover:scale-105 transition-all duration-300">
+                <div className="relative mb-6">
+                  <div className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden border-4 border-accent/30 shadow-lg animate-float-gentle">
+                    <img
+                      src="/MASAMBO.jpg"
+                      alt="Johannes Masambo"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-accent to-primary rounded-full flex items-center justify-center animate-glow-pulse">
+                    <BookOpen className="w-4 h-4 text-primary-foreground" />
+                  </div>
                 </div>
                 <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">Johannes Masambo</h3>
                 <p className="text-base text-muted-foreground mb-3">Software Developer</p>
@@ -247,13 +295,18 @@ export default function Index() {
                 </p>
               </div>
 
-              <div className="text-center p-8 md:p-10 rounded-2xl bg-card border border-border/50 shadow-sm">
-                <div className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-full overflow-hidden border-4 border-border/30 shadow-lg">
-                  <img 
-                    src="/JOEL.jpg" 
-                    alt="Joel Tiago"
-                    className="w-full h-full object-cover"
-                  />
+              <div className="text-center p-8 md:p-10 rounded-2xl app-card transform hover:scale-105 transition-all duration-300">
+                <div className="relative mb-6">
+                  <div className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden border-4 border-success/30 shadow-lg animate-float-gentle">
+                    <img
+                      src="/JOEL.jpg"
+                      alt="Joel Tiago"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-success to-warning rounded-full flex items-center justify-center animate-glow-pulse">
+                    <Gamepad2 className="w-4 h-4 text-primary-foreground" />
+                  </div>
                 </div>
                 <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">Joel Tiago</h3>
                 <p className="text-base text-muted-foreground mb-3">Technologist & CEO</p>
@@ -262,13 +315,18 @@ export default function Index() {
                 </p>
               </div>
 
-              <div className="text-center p-8 md:p-10 rounded-2xl bg-card border border-border/50 shadow-sm">
-                <div className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-full overflow-hidden border-4 border-border/30 shadow-lg">
-                  <img 
-                    src="/Edna.avif" 
-                    alt="Edna Silva"
-                    className="w-full h-full object-cover"
-                  />
+              <div className="text-center p-8 md:p-10 rounded-2xl app-card transform hover:scale-105 transition-all duration-300">
+                <div className="relative mb-6">
+                  <div className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden border-4 border-warning/30 shadow-lg animate-float-gentle">
+                    <img
+                      src="/Edna.avif"
+                      alt="Edna Silva"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-warning to-destructive rounded-full flex items-center justify-center animate-glow-pulse">
+                    <Zap className="w-4 h-4 text-primary-foreground" />
+                  </div>
                 </div>
                 <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">Edna Silva</h3>
                 <p className="text-base text-muted-foreground mb-3">Software Developer</p>
@@ -308,6 +366,22 @@ export default function Index() {
           </p>
         </div>
       </footer>
+
+      {/* Floating Action Button */}
+      <button
+        className="fab animate-glow-pulse"
+        onClick={() => {
+          const languagesSection = document.getElementById('languages-section');
+          if (languagesSection) {
+            languagesSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+        aria-label="Quick play"
+      >
+        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.586a1 1 0 01.707.293l.707.707A1 1 0 0012.414 11H15m2 0h1.586a1 1 0 01.707.293l.707.707A1 1 0 0021 12.414V15m0 2a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h3.586a1 1 0 01.707.293l.707.707A1 1 0 009.414 7H15" />
+        </svg>
+      </button>
     </div>
   );
 }
