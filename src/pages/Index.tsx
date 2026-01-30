@@ -6,7 +6,7 @@ import { ParticleBackground } from "@/components/ParticleBackground";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { AchievementBadge } from "@/components/AchievementBadge";
 import { oshikwanyamaInfo } from "@/data/oshikwanyamaData";
-import { Globe, Sparkles, BookOpen, Gamepad2, Users, MapPin, ChevronRight, Users as UsersIcon } from "lucide-react";
+import { Globe, Sparkles, BookOpen, Gamepad2, Users, MapPin, ChevronRight, Users as UsersIcon, GraduationCap, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function Index() {
@@ -332,6 +332,26 @@ export default function Index() {
                 <p className="text-base text-muted-foreground mb-3">Software Developer</p>
                 <p className="text-base text-muted-foreground/80">
                   AISOD
+                </p>
+              </div>
+
+              <div className="text-center p-8 md:p-10 rounded-2xl app-card transform hover:scale-105 transition-all duration-300">
+                <div className="relative mb-6">
+                  <div className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden border-4 border-primary/30 shadow-lg animate-float-gentle">
+                    <img
+                      src="/sarafina_frans.jpeg"
+                      alt="Sarafina Frans"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center animate-glow-pulse">
+                    <GraduationCap className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                </div>
+                <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">Sarafina Frans</h3>
+                <p className="text-base text-muted-foreground mb-3">Teacher (ICT, English and Oshikwanyama)</p>
+                <p className="text-base text-muted-foreground/80">
+                  Ministry of Education
                 </p>
               </div>
             </div>
