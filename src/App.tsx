@@ -9,6 +9,9 @@ import Index from "./pages/Index";
 import LanguageIntro from "./pages/LanguageIntro";
 import GameSelection from "./pages/GameSelection";
 import Community from "./pages/Community";
+import Admin from "./pages/Admin";
+import AdminLogin from "./pages/AdminLogin";
+import AdminAccessDenied from "./pages/AdminAccessDenied";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +29,9 @@ const App = () => (
             <Route path="/language/:languageId" element={<LanguageIntro />} />
             <Route path="/games/:languageId" element={<GameSelection />} />
             <Route path="/community" element={<Community />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/access-denied" element={<AdminAccessDenied />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </PageTransition>

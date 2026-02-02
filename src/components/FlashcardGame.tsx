@@ -4,15 +4,17 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { VocabularyItem, getRandomVocabulary, categories } from "@/data/oshikwanyamaData";
+import { useLanguageData } from "@/hooks/useLanguageData";
 import { ArrowLeft, RotateCcw, ChevronLeft, ChevronRight, Shuffle, Trophy, RefreshCw, TrendingUp, Zap } from "lucide-react";
 import { getLevelConfig, getDifficultyColor, getDifficultyLabel } from "@/utils/gameUtils";
 
 interface FlashcardGameProps {
+  languageId: string;
   onBack: () => void;
 }
 
-export function FlashcardGame({ onBack }: FlashcardGameProps) {
+export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
+  const { categories, getRandomVocabulary, isLoading } = useLanguageData(languageId);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [level, setLevel] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
@@ -148,6 +150,14 @@ export function FlashcardGame({ onBack }: FlashcardGameProps) {
             </Button>
           </div>
         </Card>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading vocabulary...</p>
       </div>
     );
   }

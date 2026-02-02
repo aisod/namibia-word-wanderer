@@ -3,15 +3,27 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/ui/Logo";
-import { oshikwanyamaInfo, categories } from "@/data/oshikwanyamaData";
+import { useLanguageData } from "@/hooks/useLanguageData";
 import { ArrowLeft, ArrowRight, Users, MapPin, Globe, Lightbulb, BookOpen, CheckCircle } from "lucide-react";
 
 export default function LanguageIntro() {
   const navigate = useNavigate();
   const { languageId } = useParams();
+  const { languageInfo, categories, isLoading } = useLanguageData(languageId);
 
-  // For now, we only have Oshikwanyama
-  const languageInfo = oshikwanyamaInfo;
+  if (!languageInfo) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        {isLoading ? (
+          <p className="text-muted-foreground">Loading...</p>
+        ) : (
+          <p className="text-muted-foreground">Language not found</p>
+        )}
+      </div>
+    );
+  }
+
+  const coverImage = languageInfo.coverImage ?? "/oshiwambo.png";
 
   return (
     <div className="min-h-screen pattern-tribal">
@@ -37,7 +49,7 @@ export default function LanguageIntro() {
         {/* Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/oshiwambo.png)' }}
+          style={{ backgroundImage: `url(${coverImage})` }}
         >
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-black/60" />

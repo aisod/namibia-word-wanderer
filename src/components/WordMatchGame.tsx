@@ -4,12 +4,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { VocabularyItem, getRandomVocabulary } from "@/data/oshikwanyamaData";
+import { useLanguageData } from "@/hooks/useLanguageData";
 import { ArrowLeft, Trophy, Star, RefreshCw, TrendingUp, Zap } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getLevelConfig, getDifficultyColor, getDifficultyLabel } from "@/utils/gameUtils";
 
 interface WordMatchGameProps {
+  languageId: string;
   onBack: () => void;
 }
 
@@ -19,7 +20,8 @@ interface MatchPair {
   oshikwanyama: string;
 }
 
-export function WordMatchGame({ onBack }: WordMatchGameProps) {
+export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
+  const { getRandomVocabulary, isLoading } = useLanguageData(languageId);
   const [level, setLevel] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
   const [pairs, setPairs] = useState<MatchPair[]>([]);
@@ -56,9 +58,9 @@ export function WordMatchGame({ onBack }: WordMatchGameProps) {
   };
 
   useEffect(() => {
-    startGame();
+    if (!isLoading) startGame();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [level]);
+  }, [level, isLoading]);
 
   useEffect(() => {
     if (selectedEnglish && selectedOshi) {
@@ -112,6 +114,14 @@ export function WordMatchGame({ onBack }: WordMatchGameProps) {
   };
 
   const progress = pairs.length > 0 ? (matchedPairs.size / pairs.length) * 100 : 0;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading vocabulary...</p>
+      </div>
+    );
+  }
 
   // Level complete screen
   if (levelComplete) {

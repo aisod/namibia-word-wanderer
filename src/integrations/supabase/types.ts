@@ -14,7 +14,149 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          id: string
+          email: string | null
+          full_name: string | null
+          role: "admin" | "moderator" | "language_register"
+          assigned_language_ids: string[]
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email?: string | null
+          full_name?: string | null
+          role?: "admin" | "moderator" | "language_register"
+          assigned_language_ids?: string[]
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string | null
+          full_name?: string | null
+          role?: "admin" | "moderator" | "language_register"
+          assigned_language_ids?: string[]
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      languages: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          native_name: string | null
+          speakers: string | null
+          regions: string[]
+          description: string | null
+          history: string | null
+          fun_facts: string[]
+          cover_image: string | null
+          is_available: boolean
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          native_name?: string | null
+          speakers?: string | null
+          regions?: string[]
+          description?: string | null
+          history?: string | null
+          fun_facts?: string[]
+          cover_image?: string | null
+          is_available?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          name?: string
+          native_name?: string | null
+          speakers?: string | null
+          regions?: string[]
+          description?: string | null
+          history?: string | null
+          fun_facts?: string[]
+          cover_image?: string | null
+          is_available?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      categories: {
+        Row: {
+          id: string
+          language_id: string
+          slug: string
+          name: string
+          icon: string
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          language_id: string
+          slug: string
+          name: string
+          icon?: string
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          language_id?: string
+          slug?: string
+          name?: string
+          icon?: string
+          sort_order?: number
+          created_at?: string
+        }
+      }
+      vocabulary: {
+        Row: {
+          id: string
+          language_id: string
+          category_id: string | null
+          english: string
+          native_word: string
+          category: string
+          difficulty: "easy" | "medium" | "hard"
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          language_id: string
+          category_id?: string | null
+          english: string
+          native_word: string
+          category: string
+          difficulty?: "easy" | "medium" | "hard"
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          language_id?: string
+          category_id?: string | null
+          english?: string
+          native_word?: string
+          category?: string
+          difficulty?: "easy" | "medium" | "hard"
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +165,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "language_register"
+      difficulty_level: "easy" | "medium" | "hard"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +293,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "language_register"],
+      difficulty_level: ["easy", "medium", "hard"],
+    },
   },
 } as const

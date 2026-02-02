@@ -4,12 +4,14 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { VocabularyItem, getRandomVocabulary, allVocabulary } from "@/data/oshikwanyamaData";
+import type { VocabularyItem } from "@/lib/languageTypes";
+import { useLanguageData } from "@/hooks/useLanguageData";
 import { ArrowLeft, Trophy, Search, RefreshCw, CheckCircle, Zap, TrendingUp } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getLevelConfig, getDifficultyColor, getDifficultyLabel, type Difficulty } from "@/utils/gameUtils";
 
 interface WordSearchGameProps {
+  languageId: string;
   onBack: () => void;
 }
 
@@ -20,7 +22,8 @@ interface WordPosition {
   found: boolean;
 }
 
-export function WordSearchGame({ onBack }: WordSearchGameProps) {
+export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
+  const { getRandomVocabulary, allVocabulary, isLoading } = useLanguageData(languageId);
   const [level, setLevel] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
   const [grid, setGrid] = useState<string[][]>([]);
@@ -262,9 +265,9 @@ export function WordSearchGame({ onBack }: WordSearchGameProps) {
   };
 
   useEffect(() => {
-    startGame();
+    if (!isLoading) startGame();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [level]);
+  }, [level, isLoading]);
 
   const handleCellClick = (row: number, col: number) => {
     if (isCellInFoundWord(row, col)) return;
@@ -405,6 +408,14 @@ export function WordSearchGame({ onBack }: WordSearchGameProps) {
   };
 
   const progress = words.length > 0 ? (foundWords.size / words.length) * 100 : 0;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading vocabulary...</p>
+      </div>
+    );
+  }
 
   // Level complete screen
   if (levelComplete) {

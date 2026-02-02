@@ -17,16 +17,16 @@ export default function GameSelection() {
 
   // Render active game
   if (activeGame === "flashcards") {
-    return <FlashcardGame onBack={() => setActiveGame(null)} />;
+    return <FlashcardGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} />;
   }
   if (activeGame === "wordmatch") {
-    return <WordMatchGame onBack={() => setActiveGame(null)} />;
+    return <WordMatchGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} />;
   }
   if (activeGame === "quiz") {
-    return <QuizGame onBack={() => setActiveGame(null)} />;
+    return <QuizGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} />;
   }
   if (activeGame === "wordsearch") {
-    return <WordSearchGame onBack={() => setActiveGame(null)} />;
+    return <WordSearchGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} />;
   }
 
   return (

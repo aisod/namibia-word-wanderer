@@ -6,11 +6,30 @@ import { ParticleBackground } from "@/components/ParticleBackground";
 import { ProgressIndicator } from "@/components/ProgressIndicator";
 import { AchievementBadge } from "@/components/AchievementBadge";
 import { oshikwanyamaInfo } from "@/data/oshikwanyamaData";
-import { Globe, Sparkles, BookOpen, Gamepad2, Users, MapPin, ChevronRight, Users as UsersIcon, GraduationCap, Zap } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLanguages } from "@/hooks/useLanguages";
+import { Globe, Sparkles, BookOpen, Gamepad2, Users, MapPin, ChevronRight, Users as UsersIcon, GraduationCap, Zap, Cpu, Megaphone } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+
+const STATIC_LANGUAGES = [
+  { slug: "oshikwanyama", name: "Oshikwanyama", nativeName: "Oshiwambo", speakers: oshikwanyamaInfo.speakers, regions: oshikwanyamaInfo.regions, coverImage: "/oshiwambo.png", isAvailable: true },
+  { slug: "otjiherero", name: "Otjiherero", nativeName: "Otjiherero", speakers: "250,000+ speakers", regions: ["Kunene", "Omaheke", "Otjozondjupa"], coverImage: "/herero.jpg", isAvailable: false },
+  { slug: "khoekhoegowab", name: "Khoekhoegowab", nativeName: "Damara/Nama", speakers: "200,000+ speakers", regions: ["Hardap", "Karas", "Erongo"], coverImage: "/khoikhoi.jpg", isAvailable: false },
+];
 
 export default function Index() {
   const navigate = useNavigate();
+  const { data: dbLanguages = [], isLoading: loadingLangs } = useLanguages();
+  const languages = dbLanguages.length > 0
+    ? dbLanguages.map((l) => ({
+        slug: l.slug,
+        name: l.name,
+        nativeName: l.nativeName,
+        speakers: l.speakers,
+        regions: l.regions,
+        coverImage: l.coverImage ?? "/oshiwambo.png",
+        isAvailable: l.isAvailable,
+      }))
+    : STATIC_LANGUAGES;
 
   return (
     <div className="min-h-screen pattern-tribal relative">
@@ -153,37 +172,18 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto">
-            {/* Oshikwanyama - Available */}
-            <LanguageCard
-              name="Oshikwanyama"
-              nativeName="Oshiwambo"
-              speakers={oshikwanyamaInfo.speakers}
-              regions={oshikwanyamaInfo.regions}
-              coverImage="/oshiwambo.png"
-              onClick={() => navigate("/language/oshikwanyama")}
-              isAvailable={true}
-            />
-
-            {/* Coming Soon Languages */}
-            <LanguageCard
-              name="Otjiherero"
-              nativeName="Otjiherero"
-              speakers="250,000+ speakers"
-              regions={["Kunene", "Omaheke", "Otjozondjupa"]}
-              coverImage="/herero.jpg"
-              onClick={() => {}}
-              isAvailable={false}
-            />
-            
-            <LanguageCard
-              name="Khoekhoegowab"
-              nativeName="Damara/Nama"
-              speakers="200,000+ speakers"
-              regions={["Hardap", "Karas", "Erongo"]}
-              coverImage="/khoikhoi.jpg"
-              onClick={() => {}}
-              isAvailable={false}
-            />
+            {languages.map((lang) => (
+              <LanguageCard
+                key={lang.slug}
+                name={lang.name}
+                nativeName={lang.nativeName}
+                speakers={lang.speakers}
+                regions={lang.regions}
+                coverImage={lang.coverImage}
+                onClick={() => lang.isAvailable ? navigate(`/language/${lang.slug}`) : undefined}
+                isAvailable={lang.isAvailable}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -354,6 +354,46 @@ export default function Index() {
                   Ministry of Education
                 </p>
               </div>
+
+              <div className="text-center p-8 md:p-10 rounded-2xl app-card transform hover:scale-105 transition-all duration-300">
+                <div className="relative mb-6">
+                  <div className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden border-4 border-accent/30 shadow-lg animate-float-gentle">
+                    <img
+                      src="/Maria_methews.jpeg"
+                      alt="Maria Mathews"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-accent to-primary rounded-full flex items-center justify-center animate-glow-pulse">
+                    <Cpu className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                </div>
+                <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">Maria Mathews</h3>
+                <p className="text-base text-muted-foreground mb-3">LRLM AI Training and Development</p>
+                <p className="text-base text-muted-foreground/80">
+                  NEDBANK
+                </p>
+              </div>
+
+              <div className="text-center p-8 md:p-10 rounded-2xl app-card transform hover:scale-105 transition-all duration-300">
+                <div className="relative mb-6">
+                  <div className="w-32 h-32 md:w-40 md:h-40 mx-auto rounded-full overflow-hidden border-4 border-success/30 shadow-lg animate-float-gentle">
+                    <img
+                      src="/HOPE.jpeg"
+                      alt="Hope"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-success to-warning rounded-full flex items-center justify-center animate-glow-pulse">
+                    <Megaphone className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                </div>
+                <h3 className="font-display text-xl md:text-2xl text-foreground mb-3">Hope</h3>
+                <p className="text-base text-muted-foreground mb-3">Marketing and Communication</p>
+                <p className="text-base text-muted-foreground/80">
+                  AISOD
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -380,6 +420,11 @@ export default function Index() {
                 className="h-7 md:h-8 w-auto object-contain"
               />
             </a>
+          </div>
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <Link to="/admin" className="text-sm text-muted-foreground/60 hover:text-muted-foreground">
+              Admin
+            </Link>
           </div>
           <p className="text-sm text-muted-foreground/50 mt-6">
             © 2026 NAMQULA. All rights reserved.

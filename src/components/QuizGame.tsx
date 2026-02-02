@@ -4,11 +4,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { VocabularyItem, getRandomVocabulary, allVocabulary } from "@/data/oshikwanyamaData";
+import type { VocabularyItem } from "@/lib/languageTypes";
+import { useLanguageData } from "@/hooks/useLanguageData";
 import { ArrowLeft, Trophy, Heart, Zap, RefreshCw, CheckCircle, XCircle, TrendingUp } from "lucide-react";
 import { getLevelConfig, getDifficultyColor, getDifficultyLabel } from "@/utils/gameUtils";
 
 interface QuizGameProps {
+  languageId: string;
   onBack: () => void;
 }
 
@@ -19,7 +21,8 @@ interface Question {
   isEnglishToOshi: boolean;
 }
 
-export function QuizGame({ onBack }: QuizGameProps) {
+export function QuizGame({ languageId, onBack }: QuizGameProps) {
+  const { getRandomVocabulary, allVocabulary, isLoading } = useLanguageData(languageId);
   const [level, setLevel] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -67,9 +70,9 @@ export function QuizGame({ onBack }: QuizGameProps) {
   };
 
   useEffect(() => {
-    generateQuestions();
+    if (!isLoading) generateQuestions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [level]);
+  }, [level, isLoading]);
 
   const handleAnswer = (answer: string) => {
     if (isAnswered) return;
@@ -104,6 +107,14 @@ export function QuizGame({ onBack }: QuizGameProps) {
       }
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading vocabulary...</p>
+      </div>
+    );
+  }
 
   // Level complete screen
   if (levelComplete && lives > 0) {
