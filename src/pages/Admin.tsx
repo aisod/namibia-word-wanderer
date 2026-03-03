@@ -141,7 +141,7 @@ function AdminContent() {
       const regions = lang.regions
         ? lang.regions.split(",").map((r) => r.trim()).filter(Boolean)
         : [];
-      const { data: langData, error: langError } = await supabase
+      const { data: langData, error: langError } = (await supabase
         .from("languages")
         .insert({
           name: lang.name,
@@ -152,10 +152,10 @@ function AdminContent() {
           description: lang.description || null,
           history: lang.history || null,
           is_available: true,
-        })
+        } as any)
         .select("id")
-        .single();
-      if (langError) throw langError;
+        .single()) as { data: { id: string } | null; error: any };
+      if (langError || !langData) throw langError ?? new Error("Failed to create language");
       for (const cat of DEFAULT_CATEGORIES) {
         await supabase.from("categories").insert({
           language_id: langData.id,
@@ -163,7 +163,7 @@ function AdminContent() {
           name: cat.name,
           icon: cat.icon,
           sort_order: cat.sort_order,
-        });
+        } as any);
       }
       return langData.id;
     },
@@ -184,7 +184,7 @@ function AdminContent() {
         native_word: word.native_word,
         category: word.category,
         difficulty: word.difficulty,
-      });
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {

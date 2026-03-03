@@ -18,7 +18,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [level, setLevel] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
-  const [cards, setCards] = useState<VocabularyItem[]>([]);
+  const [cards, setCards] = useState<import("@/lib/languageTypes").VocabularyItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [learnedCards, setLearnedCards] = useState<Set<string>>(new Set());
