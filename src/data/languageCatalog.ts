@@ -1,4 +1,5 @@
 import type { LanguageInfo } from "@/lib/languageTypes";
+import { CONTENT_RELEASE } from "./contentRelease";
 export interface CatalogLanguage extends LanguageInfo {
   id: string; slug: string; coverImage: string; isAvailable: boolean; wordCount: number;
 }
@@ -17,6 +18,6 @@ const languageDefinitions: CatalogLanguage[] = [
   { id: "local-kwn", slug: "rukwangali", name: "Rukwangali", nativeName: "Rukwangali", speakers: "", coverImage: "", isAvailable: true, wordCount: 24,
     ...LANGUAGE_PROFILES.rukwangali },
 ];
-export const LOCAL_LANGUAGES = languageDefinitions;
+export const LOCAL_LANGUAGES = languageDefinitions.map(language => ({ ...language, wordCount: CONTENT_RELEASE.packs[language.slug as keyof typeof CONTENT_RELEASE.packs] }));
 export const resolveLanguageSlug = (slug?: string) => slug === "kwangari" || slug === "kwangali" ? "rukwangali" : slug;
 export const getLocalLanguage = (slug?: string) => LOCAL_LANGUAGES.find(l => l.slug === resolveLanguageSlug(slug));

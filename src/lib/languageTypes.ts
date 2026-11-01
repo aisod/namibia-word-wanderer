@@ -13,6 +13,9 @@ export interface VocabularyItem {
   license?: string;
   sourceRecordId?: string;
   reviewStatus?: string;
+  usageNote?: string;
+  sourcePage?: number;
+  corpusAssetId?: string;
   category: string;
   difficulty: "easy" | "medium" | "hard";
 }

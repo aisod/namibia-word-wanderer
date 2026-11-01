@@ -11,6 +11,7 @@ const Index = lazy(() => import("./pages/Index"));
 const LanguageIntro = lazy(() => import("./pages/LanguageIntro"));
 const GameSelection = lazy(() => import("./pages/GameSelection"));
 const Community = lazy(() => import("./pages/Community"));
+const WordLibrary = lazy(() => import("./pages/WordLibrary"));
 const Admin = lazy(() => import("./pages/Admin"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminAccessDenied = lazy(() => import("./pages/AdminAccessDenied"));
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/language/:languageId" element={<LanguageIntro />} />
             <Route path="/games/:languageId" element={<GameSelection />} />
+            <Route path="/words/:languageId" element={<WordLibrary />} />
             <Route path="/community" element={<Community />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/login" element={<AdminLogin />} />

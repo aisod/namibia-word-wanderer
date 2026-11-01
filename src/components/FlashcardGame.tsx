@@ -1,4 +1,6 @@
 import { VocabularyStatus } from "./VocabularyStatus";
+import { shuffle } from "@/lib/vocabularyUtils";
+import { recordPractice } from "@/lib/learningProgress";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,10 +14,12 @@ import { getLevelConfig, getDifficultyColor, getDifficultyLabel } from "@/utils/
 interface FlashcardGameProps {
   languageId: string;
   onBack: () => void;
+  initialCategory?: string;
+  reviewOnly?: boolean;
 }
 
-export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
-  const { categories, getRandomVocabulary, allVocabulary, isLoading, error, retry, languageInfo } = useLanguageData(languageId);
+export function FlashcardGame({ languageId, onBack, initialCategory, reviewOnly=false }: FlashcardGameProps) {
+  const { categories, getRandomVocabulary, getReviewVocabulary, allVocabulary, isLoading, error, retry, languageInfo } = useLanguageData(languageId);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [level, setLevel] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
@@ -26,16 +30,19 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
   const [levelComplete, setLevelComplete] = useState(false);
 
   const levelConfig = getLevelConfig(level, 'flashcards');
+  const chooseCards=(categoryId: string)=> (reviewOnly ? getReviewVocabulary : getRandomVocabulary)(levelConfig.wordCount, categoryId === "all" ? undefined : categoryId);
 
   const startGame = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    setCards(getRandomVocabulary(levelConfig.wordCount, categoryId === "all" ? undefined : categoryId));
+    setCards(chooseCards(categoryId));
     setCurrentIndex(0); setIsFlipped(false); setLearnedCards(new Set()); setLevelComplete(false);
   };
 
+  useEffect(()=>{if(!isLoading&&initialCategory)startGame(initialCategory);},[isLoading,initialCategory,reviewOnly]);
+
   useEffect(() => {
     if (selectedCategory) {
-      const vocab = getRandomVocabulary(levelConfig.wordCount, selectedCategory === "all" ? undefined : selectedCategory);
+      const vocab = chooseCards(selectedCategory);
       setCards(vocab);
       setCurrentIndex(0);
       setIsFlipped(false);
@@ -62,6 +69,8 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
   };
 
   const markAsLearned = () => {
+    if(!isFlipped || !cards[currentIndex] || learnedCards.has(cards[currentIndex].id))return;
+    recordPractice(languageId,cards[currentIndex],true,"self");
     const newLearned = new Set(learnedCards);
     newLearned.add(cards[currentIndex].id);
     setLearnedCards(newLearned);
@@ -75,7 +84,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
   };
 
   const shuffleCards = () => {
-    setCards([...cards].sort(() => Math.random() - 0.5));
+    setCards(shuffle(cards));
     setCurrentIndex(0);
     setIsFlipped(false);
   };
@@ -97,7 +106,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
             Level {level} Complete! 🎉
           </h2>
           <p className="text-muted-foreground mb-6">
-            You've learned all the flashcards!
+            You've practised every card in this round. Come back to recall them again.
           </p>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
@@ -114,7 +123,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="p-4 rounded-xl bg-primary/10">
               <p className="text-lg font-bold text-primary">{cards.length}</p>
-              <p className="text-sm text-muted-foreground">Cards Learned</p>
+              <p className="text-sm text-muted-foreground">Cards Practised</p>
             </div>
             <div className="p-4 rounded-xl bg-primary/10">
               <p className="text-lg font-bold text-primary">+{levelBonus}</p>
@@ -210,6 +219,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
   }
 
   const currentCard = cards[currentIndex];
+  if(!currentCard)return <div className="game-screen"><h2>No words due in this topic</h2><p>Explore another topic, or come back when your next review is due.</p><Button onClick={onBack}>Back to Games</Button></div>;
   const progress = cards.length > 0 ? ((learnedCards.size) / cards.length) * 100 : 0;
 
   return (
@@ -233,7 +243,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
               Total: {totalScore + (learnedCards.size * levelConfig.pointsPerWord)}
             </Badge>
             <Badge variant="outline" className="bg-success/20 text-success">
-              {learnedCards.size} / {cards.length} learned
+              {learnedCards.size} / {cards.length} practised
             </Badge>
           </div>
         </div>
@@ -305,6 +315,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
           </Button>
 
           <div className="flex gap-2">
+            <Button variant="outline" onClick={()=>{recordPractice(languageId,currentCard,false,"self");setCurrentIndex((currentIndex+1)%cards.length);setIsFlipped(false);}} disabled={!isFlipped}>Review again</Button>
             <Button variant="outline" onClick={shuffleCards}>
               <Shuffle className="w-4 h-4 mr-2" />
               Shuffle
@@ -312,7 +323,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
             <Button 
               className="bg-success hover:bg-success/90 text-success-foreground"
               onClick={markAsLearned}
-              disabled={learnedCards.has(cards[currentIndex]?.id)}
+              disabled={!isFlipped || learnedCards.has(cards[currentIndex]?.id)}
             >
               ✓ Got it!
             </Button>

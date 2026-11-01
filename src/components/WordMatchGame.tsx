@@ -1,4 +1,5 @@
 import { shuffle } from "@/lib/vocabularyUtils";
+import { recordPractice } from "@/lib/learningProgress";
 import { VocabularyStatus } from "./VocabularyStatus";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -75,6 +76,8 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
     if (matchLock.current) return;
     matchLock.current = true;
     const pair = pairs.find(p => p.english === english && p.oshikwanyama === native);
+    const practised=allVocabulary.find(w=>w.english===english);
+    if(practised)recordPractice(languageId,practised,!!pair);
     setAttempts(prev => prev + 1);
     if (pair && !matchedPairs.has(pair.id)) {
       const next = new Set(matchedPairs); next.add(pair.id);

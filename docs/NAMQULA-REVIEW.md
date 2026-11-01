@@ -1,5 +1,7 @@
 # Namqula: findings and next product steps
 
+**Historical review retained for context. Current implementation, fixed gaps, content counts and remaining work are recorded in [RELEASE-2026-11-02.md](RELEASE-2026-11-02.md).** The earlier offline/build/in-preparation statements below describe previous checkpoints and are superseded by the later releases.
+
 Inspected upstream commit 3bc2edf and the public Lovable game on 1 November 2026. Static findings are distinguished below from measured results. No controlled before/after browser benchmark or production database trace has been completed.
 
 ## Assessment

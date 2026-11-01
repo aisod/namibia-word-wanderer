@@ -1,4 +1,5 @@
 import { gridLetters } from "@/lib/vocabularyUtils";
+import { recordPractice } from "@/lib/learningProgress";
 import { VocabularyStatus } from "./VocabularyStatus";
 import { useState, useEffect, type CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
@@ -294,6 +295,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
       setWords(previous => previous.map(w => w.word.id === found.word.id ? { ...w, positions: selection } : w));
       setFoundWords(next); setScore(score + levelConfig.pointsPerWord);
       setLastFound(`${found.word.oshikwanyama} = ${found.word.english}`);
+      recordPractice(languageId,found.word,true,"spelling");
       clearSelection(); if (next.size === words.length) setLevelComplete(true);
     } else { setSelectedCells(selection); setSelectedWordId(null); }
   };

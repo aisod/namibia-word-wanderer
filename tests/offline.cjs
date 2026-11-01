@@ -37,6 +37,6 @@ const { pathToFileURL } = require('node:url');
     assert.notEqual(source,await fs.readFile(path.join(directory,'sw.js'),'utf8'));
     fail=true; stores.set('namqula-offline-previous',new Map()); handlers.install({waitUntil(promise){pending=promise;}}); await assert.rejects(pending); assert(stores.has('namqula-offline-previous'));
     for(const name of ['oshikwanyama','oshindonga','otjiherero','khoekhoegowab','chokwe','rukwangali']) for(const row of JSON.parse(await fs.readFile(`public/data/${name}.json`,'utf8'))) { assert.equal(row.corpusUrl,'https://corpus.aisod.tech'); assert(row.corpusAttribution.includes('all its contributors')); assert(row.sourceUrl); assert(row.license); }
-    console.log('Offline caching, deep links, update isolation, failure recovery and all 311 corpus credits passed');
+    console.log('Offline caching, deep links, update isolation, failure recovery and all corpus credits passed');
   } finally { await fs.rm(directory,{recursive:true,force:true}); }
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -25,7 +25,7 @@ export default function LanguageIntro() {
       <section><div className="profile-section-title"><MapPin aria-hidden="true"/><h2>Where it’s spoken</h2></div>{languageInfo.geography && <p>{languageInfo.geography}</p>}<ul className="country-list">{languageInfo.regions.map(region=><li key={region}>{region}</li>)}</ul></section>
       {languageInfo.funFacts.length > 0 && <section><div className="profile-section-title"><Sparkles aria-hidden="true"/><h2>Language & everyday life</h2></div><ul className="language-facts">{languageInfo.funFacts.map(fact=><li key={fact}>{fact}</li>)}</ul></section>}
     </div>
-    <section className="course-preview"><p className="eyebrow">Learn by doing</p><h2>Your {languageInfo.name} practice</h2><p>Explore {local?.wordCount ?? "the available"} words through flashcards, matching, quizzes and word search.</p>
+    <section className="course-preview"><p className="eyebrow">Learn by doing</p><h2>Your {languageInfo.name} practice</h2><p>Explore {local?.wordCount ?? "the available"} words and phrases through flashcards, matching, quizzes and word search.</p><Link className="text-link" to={`/words/${local?.slug??languageId}`}>Browse the word collection<ArrowRight aria-hidden="true"/></Link>
       {isLoading ? <p role="status">Loading vocabulary categories…</p> : error ? <p>Vocabulary is unavailable right now. <button className="text-link" onClick={()=>retry()}>Try again</button></p> : <div className="category-chips">{categories.map(cat=><span key={cat.id}>{cat.name}<small>{cat.count} {cat.count===1?"word":"words"}</small></span>)}</div>}
       <Link className="primary-action" to={`/games/${local?.slug ?? languageId}`}>Choose a game<ArrowRight aria-hidden="true"/></Link>
     </section>

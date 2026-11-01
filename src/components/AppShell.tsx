@@ -48,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("keydown",move);
   }, [tv, navigate, location.pathname]);
   useEffect(() => { if (location.hash === "#languages") document.getElementById("languages")?.scrollIntoView({block: "start"}); }, [location.pathname, location.hash]);
-  const isActive = (to: string) => to === "/community" ? location.pathname.startsWith(to) : to === "/#languages" ? location.hash === "#languages" || location.pathname.startsWith("/language/") : location.pathname === "/" && location.hash !== "#languages";
+  const isActive = (to: string) => to === "/community" ? location.pathname.startsWith(to) : to === "/#languages" ? location.hash === "#languages" || /^\/(language|words|games)\//.test(location.pathname) : location.pathname === "/" && location.hash !== "#languages";
   const links=[{to:"/",label:"Learn",icon:Home},{to:"/#languages",label:"Languages",icon:BookOpen},{to:"/community",label:"Community",icon:Users}];
   if (admin) return <>{children}</>;
   return <div className={`app-shell ${game ? "is-game" : ""}`}>
