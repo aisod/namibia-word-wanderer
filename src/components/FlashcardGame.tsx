@@ -270,6 +270,7 @@ export function FlashcardGame({ languageId, onBack, initialCategory, reviewOnly=
             {/* Front */}
             <Card 
               className="absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-card to-secondary/20 backface-hidden"
+              aria-hidden={isFlipped}
               style={{ backfaceVisibility: "hidden" }}
             >
               <p className="text-sm text-muted-foreground mb-4 uppercase tracking-wide">
@@ -286,6 +287,7 @@ export function FlashcardGame({ languageId, onBack, initialCategory, reviewOnly=
             {/* Back */}
             <Card 
               className="absolute inset-0 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-primary/10 to-sunset-gold/10 backface-hidden"
+              aria-hidden={!isFlipped}
               style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
             >
               <p className="text-sm text-muted-foreground mb-4 uppercase tracking-wide">
