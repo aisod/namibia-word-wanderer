@@ -1,14 +1,24 @@
 {
+  "release": "2026-11-02",
+  "previousRelease": "2026-11-01",
+  "previousPacks": {
+    "oshikwanyama": 111,
+    "oshindonga": 96,
+    "otjiherero": 12,
+    "khoekhoegowab": 44,
+    "chokwe": 24,
+    "rukwangali": 24
+  },
   "localSourceSha256": "01ee255e1202f3cde7699faf20456f8106e4f85583392dfa7cdd44fd894ac515",
   "rawRecords": 6526,
   "excludedPythonInternals": 159,
   "packs": {
-    "chokwe": 24,
-    "khoekhoegowab": 44,
-    "oshikwanyama": 111,
-    "oshindonga": 96,
-    "otjiherero": 12,
-    "rukwangali": 24
+    "chokwe": 36,
+    "khoekhoegowab": 84,
+    "oshikwanyama": 159,
+    "oshindonga": 154,
+    "otjiherero": 37,
+    "rukwangali": 121
   },
   "corpusAttribution": "AISOD Corpus of Language Data and all its contributors",
   "corpusUrl": "https://corpus.aisod.tech"

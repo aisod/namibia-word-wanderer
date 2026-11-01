@@ -1,5 +1,7 @@
 # NAMQULA experience review
 
+Current follow-up: [2 November content and learning release](RELEASE-2026-11-02.md). Word browsing, topic practice, saved per-word progress and due reviews now address the earlier learning-depth gaps. Native-speaker recordings/sign-off, a live corpus release API and cloud progress sync remain explicitly unimplemented.
+
 ## Corrected issues
 
 - Word Match stacked the entire English list above the translation list below the phone viewport. Both sides now share one two-column board at every width, with native buttons, selection states, matched markers and inline feedback. Rounds stay at four to six pairs rather than expanding to twelve rows.

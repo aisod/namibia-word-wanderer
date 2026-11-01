@@ -28,7 +28,10 @@ console.log(`${count} vocabulary and Unicode assertions passed`);
 
 const catalogModule = ts.transpileModule(fs.readFileSync('src/data/languageCatalog.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
 const profiles = {exports:{}}; new Function('exports',ts.transpileModule(fs.readFileSync('src/data/languageProfiles.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(profiles.exports);
-const catalog = {exports:{}}; new Function('exports','require',catalogModule)(catalog.exports,id=>id==='./languageProfiles'?profiles.exports:require(id));
+const release=JSON.parse(fs.readFileSync('public/data/manifest.json','utf8'));
+const generated={exports:{}};new Function('exports',ts.transpileModule(fs.readFileSync('src/data/contentRelease.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(generated.exports);
+assert.deepEqual(generated.exports.CONTENT_RELEASE,release,'Generated catalog metadata must match the shipped manifest');
+const catalog = {exports:{}}; new Function('exports','require',catalogModule)(catalog.exports,id=>id==='./languageProfiles'?profiles.exports:id==='./contentRelease'?generated.exports:require(id));
 assert.equal(catalog.exports.getLocalLanguage('oshikwanyama').slug,'oshikwanyama');
 assert.equal(catalog.exports.getLocalLanguage('oshindonga').slug,'oshindonga');
 assert.equal(catalog.exports.getLocalLanguage('kwangari').slug,'rukwangali');
@@ -46,3 +49,13 @@ for(const language of catalog.exports.LOCAL_LANGUAGES){
  assert.ok(!/Wiktionary|Hai ti|starter pack|source-backed|translated by/i.test(language.description+' '+language.history));
 }
 console.log('All six researched language profiles have substantive cultural and geographic content');
+for(const language of catalog.exports.LOCAL_LANGUAGES){
+ const rows=JSON.parse(fs.readFileSync(`public/data/${language.slug}.json`,'utf8'));
+ assert.equal(language.wordCount,rows.length,'Catalog count drift');
+ assert.equal(release.packs[language.slug],rows.length,'Manifest count drift');
+ assert(rows.length>release.previousPacks[language.slug],'Each language must grow');
+ assert.equal(new Set(rows.map(w=>w.id)).size,rows.length,'Duplicate stable IDs');
+ assert(rows.every(w=>w.reviewStatus==='source-backed'&&w.corpusAttribution.includes('all its contributors')&&w.corpusUrl==='https://corpus.aisod.tech'));
+ assert(rows.every(w=>!/__builtins__|<built-in|undefined|TODO/.test(w.english+' '+w.oshikwanyama)));
+}
+console.log('All six expanded collections have accurate counts, stable IDs and corpus credits');

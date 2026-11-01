@@ -18,3 +18,8 @@ jobs:
       - run: npm test
       - run: npx tsc --noEmit -p tsconfig.app.json
       - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: namqula-production-preview
+          path: dist
+          retention-days: 3

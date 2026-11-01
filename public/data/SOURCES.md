@@ -1,5 +1,9 @@
 # Namqula language data: sources and reuse
 
+## 2 November 2026 expansion
+
+Current playable counts: Oshindonga 154; Oshikwanyama 159; Otjiherero 37; Khoekhoegowab 84; Chokwe 36; Rukwangali 121. The original sections below describe the initial seed; the versioned additions are in `scripts/vocabulary-expansion.json` and documented in `docs/RELEASE-2026-11-02.md`. Every record keeps its individual source/rights metadata. The Rukwangali ordinary vocabulary facts were checked against Peace Corps Namibia's Rukwangali Language Manual, https://www.livelingua.com/peace-corps/Kwangali/Rukwangali.pdf, pages 14, 33, 40, 42 and 47. No open licence is asserted for that manual's training text (NOASSERTION); the additions do not copy its long passages, illustrations, audio or exercises. The earlier note that no manual data was consulted is historical. Original storybook records retain CC BY 3.0. Khoekhoe additions join documented noun endings, preserving hyphens, clicks and vowel marks. Chokwe additions include attested plurals with learner notes.
+
 ## AISOD corpus and contributor acknowledgement
 
 Namqula credits the **[AISOD Corpus of Language Data](https://corpus.aisod.tech) and all its contributors** for corpus stewardship, community knowledge and the mission of language, cultural and data preservation. Help enrich the corpus with more words, languages, context and recordings.

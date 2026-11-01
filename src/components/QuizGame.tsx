@@ -1,4 +1,5 @@
 import { makeOptions } from "@/lib/vocabularyUtils";
+import { recordPractice } from "@/lib/learningProgress";
 import { VocabularyStatus } from "./VocabularyStatus";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -78,6 +79,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
     setIsAnswered(true);
 
     const currentQuestion = questions[currentIndex];
+    recordPractice(languageId, currentQuestion.word, answer === currentQuestion.correctAnswer);
     
     if (answer === currentQuestion.correctAnswer) {
       setScore(prev => prev + levelConfig.pointsPerWord);

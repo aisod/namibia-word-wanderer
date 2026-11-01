@@ -1,8 +1,9 @@
 const fs=require('fs'),path=require('path'),assert=require('node:assert/strict');
 const ts=require('typescript');
-const React=require('react');
+const reactBase=path.dirname(require.resolve('react-test-renderer/package.json'));
+const React=require(require.resolve('react',{paths:[reactBase]}));
 const {act,create}=require('react-test-renderer');
-const jsx=require('react/jsx-runtime');
+const jsx=require(require.resolve('react/jsx-runtime',{paths:[reactBase]}));
 let currentData, toastCount=0;const cache={};
 function load(file){
  file=path.resolve('src',file);
@@ -13,6 +14,8 @@ function load(file){
   if(id==='react')return React;
   if(id==='react/jsx-runtime')return jsx;
   if(id==='@/hooks/useLanguageData')return {useLanguageData:()=>currentData};
+  if(id==='@/hooks/useLearningProgress')return {useLearningProgress:()=>({})};
+  if(id==='react-router-dom')return {useParams:()=>({languageId:currentData.slug}),Link:props=>React.createElement('a',props,props.children)};
   if(id==='@/hooks/use-toast')return {toast:()=>toastCount++};
   if(id==='@/lib/utils')return {cn:(...args)=>args.filter(Boolean).join(' ')};
   if(id==='lucide-react')return new Proxy({},{get:(_,name)=>props=>React.createElement('i',{'data-icon':String(name)})});
@@ -32,7 +35,7 @@ let checks=0;
 async function main(){
  for(const slug of ['oshikwanyama','oshindonga','otjiherero','khoekhoegowab','chokwe','rukwangali']){
   const words=JSON.parse(fs.readFileSync(`public/data/${slug}.json`,'utf8'));
-  currentData={isLoading:false,error:null,retry:()=>{},languageInfo:{name:slug},allVocabulary:words,categories:[{id:'all',name:'All',icon:'',count:words.length}],getRandomVocabulary:(count,cat)=>util.shuffle(words.filter(w=>!cat||w.category===cat)).slice(0,count)};
+  currentData={slug,isLoading:false,error:null,retry:()=>{},languageInfo:{name:slug},allVocabulary:words,categories:[{id:'all',name:'All',icon:'',count:words.length}],getReviewVocabulary:()=>[],getRandomVocabulary:(count,cat)=>util.shuffle(words.filter(w=>!cat||w.category===cat)).slice(0,count)};
   for(const name of ['QuizGame','WordMatchGame','WordSearchGame','FlashcardGame']){
    const Component=load(`components/${name}.tsx`)[name];let renderer;
    act(()=>{renderer=create(React.createElement(Component,{languageId:slug,onBack:()=>{}}));});
@@ -75,11 +78,22 @@ async function main(){
     // Category cards remain rendered as UI stubs, choose the first category.
     const clickable=renderer.root.findAll(n=>n.type==='div'&&n.props.onClick);
     act(()=>clickable[0].props.onClick());
+    assert.equal(renderer.root.findAllByType('button').find(b=>text(b.props.children).includes('Got it')).props.disabled,true,'Cannot self-mark before revealing the answer');checks++;
     const flip=renderer.root.findByProps({'aria-label':'Flip vocabulary card'});
     act(()=>flip.props.onClick());assert.ok(snapshot(renderer).includes('Powered by AISOD Corpus and its contributors'));checks++;
+    assert.equal(renderer.root.findAllByType('button').find(b=>text(b.props.children).includes('Got it')).props.disabled,false);checks++;
+    assert.ok(snapshot(renderer).includes('Review again'));checks++;
    }
    act(()=>renderer.unmount());
   }
+  let library;act(()=>library=create(React.createElement(load('pages/WordLibrary.tsx').default)));
+  assert.equal(library.root.findAllByType('article').length,24,'Word browser must paginate the expanded pack');checks++;
+  act(()=>library.root.findByProps({type:'search'}).props.onChange({target:{value:words[0].oshikwanyama}}));
+  assert(library.root.findAllByType('article').some(a=>text(a.children).includes(words[0].english)),'Native-language search must find its meaning');checks++;
+  act(()=>library.root.findByProps({type:'search'}).props.onChange({target:{value:'__no_such_word__'}}));
+  assert(snapshot(library).includes('No words match'));checks++;act(()=>library.unmount());
+  let due;act(()=>due=create(React.createElement(load('components/FlashcardGame.tsx').FlashcardGame,{languageId:slug,onBack:()=>{},initialCategory:'all',reviewOnly:true})));
+  assert(snapshot(due).includes('No words due'),'Empty review must offer recovery instead of a blank card');checks++;act(()=>due.unmount());
  }
  // The same game must expose recovery, rather than blank content, after a data failure.
  currentData={isLoading:false,error:new Error('offline'),retry:()=>{},languageInfo:null,allVocabulary:[],categories:[],getRandomVocabulary:()=>[]};
