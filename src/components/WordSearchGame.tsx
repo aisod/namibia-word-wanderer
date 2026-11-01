@@ -282,10 +282,15 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
       const straight = selection.every(p => p.row === first.row) || selection.every(p => p.col === first.col);
       if (!adjacent || !straight) selection = [cell];
     }
-    const same = (a: typeof selection, b: typeof selection) => a.length === b.length && a.every((p, i) => p.row === b[i].row && p.col === b[i].col);
-    const found = words.find(w => !foundWords.has(w.word.id) && (same(selection, w.positions) || same(selection, [...w.positions].reverse())));
+    const selectedLetters = selection.map(p => grid[p.row][p.col]).join("");
+    const found = words.find(w => {
+      if (foundWords.has(w.word.id)) return false;
+      const letters = gridLetters(w.word.oshikwanyama);
+      return selectedLetters === letters.join("") || selectedLetters === [...letters].reverse().join("");
+    });
     if (found) {
       const next = new Set(foundWords); next.add(found.word.id);
+      setWords(previous => previous.map(w => w.word.id === found.word.id ? { ...w, positions: selection } : w));
       setFoundWords(next); setScore(score + levelConfig.pointsPerWord);
       toast({ title: `${found.word.oshikwanyama} found!`, description: `English: ${found.word.english}`, duration: 3000 });
       clearSelection(); if (next.size === words.length) setLevelComplete(true);
@@ -451,10 +456,10 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
   }
 
   return (
-    <div className="min-h-screen p-3 md:p-4 lg:p-8">
+    <div className="game-screen wordsearch-screen">
       <div className="max-w-2xl md:max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4 md:mb-6">
+        <div className="game-header">
           <Button variant="ghost" onClick={onBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -598,7 +603,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
         {/* Instructions */}
           <Card className="p-3 md:p-4 bg-primary/5 border-primary/20">
           <p className="text-xs md:text-sm text-center text-muted-foreground">
-            💡 Tap letters in order to form {languageInfo?.name} words. Words can be horizontal or vertical. On smaller screens, swipe across the board when needed.
+            💡 Tap letters in order to form {languageInfo?.name} words. Words can be horizontal or vertical. Tap the first letter again to clear your selection.
           </p>
         </Card>
       </div>

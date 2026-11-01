@@ -18,8 +18,8 @@ const { pathToFileURL } = require('node:url');
       async open(key) { if (!stores.has(key)) stores.set(key,new Map()); const data=stores.get(key); return {async addAll(requests) { if(fail) throw Error('network'); for(const r of requests) data.set(new URL(r.url,'https://play.aisod.tech').pathname,r.url); }, async match(key) { return data.get(key); }}; },
       async keys() { return [...stores.keys()]; }, async delete(key) { return stores.delete(key); }
     };
-    let claimed=false;
-    vm.runInNewContext(source,{caches,Request:class {constructor(url){this.url=url;}},URL,fetch:async()=>{throw Error('offline');},self:{location:{origin:'https://play.aisod.tech'},clients:{async claim(){claimed=true;}},addEventListener(name,handler){handlers[name]=handler;}}});
+    let claimed=false; let skipped=false;
+    vm.runInNewContext(source,{caches,Request:class {constructor(url){this.url=url;}},URL,fetch:async()=>{throw Error('offline');},self:{async skipWaiting(){skipped=true;},location:{origin:'https://play.aisod.tech'},clients:{async claim(){claimed=true;}},addEventListener(name,handler){handlers[name]=handler;}}});
     let pending; handlers.install({waitUntil(promise){pending=promise;}}); await pending;
     stores.set('unrelated-cache',new Map()); stores.set('namqula-offline-old',new Map());
     handlers.activate({waitUntil(promise){pending=promise;}}); await pending; assert(claimed); assert(stores.has('unrelated-cache')); assert(!stores.has('namqula-offline-old'));
@@ -32,6 +32,7 @@ const { pathToFileURL } = require('node:url');
     assert.equal(await request('https://database.example/rest/v1/words'),undefined);
     assert.equal(await request('https://play.aisod.tech/api','cors','POST'),undefined);
     let ready; handlers.message({data:'OFFLINE_STATUS',ports:[{postMessage(value){ready=value.ready;}}]}); assert(ready);
+    handlers.message({data:'ACTIVATE_UPDATE',waitUntil(promise){pending=promise;}}); await pending; assert(skipped);
     await fs.writeFile(path.join(directory,'data/chokwe.json'),'updated'); await buildOffline(directory);
     assert.notEqual(source,await fs.readFile(path.join(directory,'sw.js'),'utf8'));
     fail=true; stores.set('namqula-offline-previous',new Map()); handlers.install({waitUntil(promise){pending=promise;}}); await assert.rejects(pending); assert(stores.has('namqula-offline-previous'));

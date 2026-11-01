@@ -1,3 +1,4 @@
+import { shuffle } from "@/lib/vocabularyUtils";
 import { VocabularyStatus } from "./VocabularyStatus";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,6 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { useLanguageData } from "@/hooks/useLanguageData";
 import { ArrowLeft, Trophy, Star, RefreshCw, TrendingUp, Zap } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 import { getLevelConfig, getDifficultyColor, getDifficultyLabel } from "@/utils/gameUtils";
 
 interface WordMatchGameProps {
@@ -35,6 +35,7 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
   const [streak, setStreak] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [levelComplete, setLevelComplete] = useState(false);
+  const [feedback, setFeedback] = useState("Tap one word on each side.");
 
   const matchLock = useRef(false);
   const clearTimer = useRef<ReturnType<typeof setTimeout>>();
@@ -45,7 +46,7 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
   const startGame = () => {
     clearTimeout(clearTimer.current);
     matchLock.current = false;
-    const vocab = getRandomVocabulary(levelConfig.wordCount);
+    const vocab = getRandomVocabulary(Math.min(levelConfig.wordCount, 6));
     const gamePairs = vocab.map(v => ({
       id: v.id,
       english: v.english,
@@ -53,8 +54,8 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
     }));
     
     setPairs(gamePairs);
-    setEnglishWords([...gamePairs.map(p => p.english)].sort(() => Math.random() - 0.5));
-    setOshiWords([...gamePairs.map(p => p.oshikwanyama)].sort(() => Math.random() - 0.5));
+    setEnglishWords(shuffle(gamePairs.map(p => p.english)));
+    setOshiWords(shuffle(gamePairs.map(p => p.oshikwanyama)));
     setMatchedPairs(new Set());
     setSelectedEnglish(null);
     setSelectedOshi(null);
@@ -62,6 +63,7 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
     setStreak(0);
     setAttempts(0);
     setLevelComplete(false);
+    setFeedback("Tap one word on each side.");
   };
 
   useEffect(() => {
@@ -77,12 +79,13 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
     if (pair && !matchedPairs.has(pair.id)) {
       const next = new Set(matchedPairs); next.add(pair.id);
       setMatchedPairs(next);
+      setFeedback(`Matched: ${pair.english} = ${pair.oshikwanyama}`);
       setScore(prev => prev + levelConfig.pointsPerWord * (streak + 1));
       setStreak(prev => prev + 1);
-      toast({ title: "Correct!", description: `${pair.english} = ${pair.oshikwanyama}`, duration: 1500 });
       if (next.size === pairs.length) setLevelComplete(true);
     } else {
-      setStreak(0); toast({ title: "Try again", description: "That’s not a match", duration: 1500 });
+      setFeedback("Not a match yet. Choose another pair.");
+      setStreak(0);
     }
     clearTimer.current = setTimeout(() => {
       setSelectedEnglish(null); setSelectedOshi(null); matchLock.current = false;
@@ -187,10 +190,10 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="game-screen match-screen">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="game-header">
           <Button variant="ghost" onClick={onBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -215,72 +218,36 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
           </div>
         </div>
 
-        <div className="text-center mb-6">
+        <div className="game-title">
           <h2 className="font-display text-2xl md:text-3xl text-foreground mb-2">
             Word Match
           </h2>
           <p className="text-muted-foreground">
-            Match the English words with their {languageInfo?.name} translations
+            Tap an English word, then its {languageInfo?.name} match.
           </p>
         </div>
 
         {/* Progress */}
-        <Progress value={progress} className="mb-8 h-2" />
+        <div className="match-progress"><span>{matchedPairs.size} of {pairs.length} pairs matched</span><Progress value={progress} className="h-1.5" /></div>
+        <p className="match-feedback" role="status" aria-live="polite">{feedback}</p>
 
-        {/* Game Grid */}
-        <div className="grid md:grid-cols-2 gap-6 md:gap-10">
-          {/* English Column */}
-          <div>
-            <h3 className="font-display text-lg text-center mb-4 text-muted-foreground">
-              English
-            </h3>
-            <div className="space-y-3">
-              {englishWords.map((word) => (
-                <Card
-                  key={word}
-                  role="button" tabIndex={0}
-                  onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }}
-                  onClick={() => chooseEnglish(word)}
-                  className={cn(
-                    "p-4 cursor-pointer transition-all duration-200 text-center font-medium",
-                    isEnglishMatched(word) && "bg-success/20 border-success opacity-60 cursor-default",
-                    selectedEnglish === word && !isEnglishMatched(word) && "border-primary bg-primary/10 ring-2 ring-primary",
-                    !isEnglishMatched(word) && selectedEnglish !== word && "hover:border-primary/50"
-                  )}
-                >
-                  {word}
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          {/* Oshikwanyama Column */}
-          <div>
-            <h3 className="font-display text-lg text-center mb-4 text-muted-foreground">
-              {languageInfo?.name}
-            </h3>
-            <div className="space-y-3">
-              {oshiWords.map((word) => (
-                <Card
-                  key={word}
-                  role="button" tabIndex={0}
-                  onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }}
-                  onClick={() => chooseNative(word)}
-                  className={cn(
-                    "p-4 cursor-pointer transition-all duration-200 text-center font-medium",
-                    isOshiMatched(word) && "bg-success/20 border-success opacity-60 cursor-default",
-                    selectedOshi === word && !isOshiMatched(word) && "border-accent bg-accent/10 ring-2 ring-accent",
-                    !isOshiMatched(word) && selectedOshi !== word && "hover:border-accent/50"
-                  )}
-                >
-                  {word}
-                </Card>
-              ))}
-            </div>
-          </div>
+        <div className="match-board" aria-label="Match English and native words">
+          <section aria-label="English words"><h3>English</h3><div className="match-column">
+            {englishWords.map(word => <button type="button" key={word} data-match-side="english" data-word={word}
+              aria-label={`English: ${word}${isEnglishMatched(word) ? ", matched" : ""}`} aria-pressed={selectedEnglish === word} disabled={isEnglishMatched(word)}
+              onClick={() => chooseEnglish(word)} className={cn("match-tile", isEnglishMatched(word) && "is-matched", selectedEnglish === word && !isEnglishMatched(word) && "is-selected")}>
+              <span>{word}</span>{isEnglishMatched(word) && <span className="match-check" aria-hidden="true">✓</span>}
+            </button>)}
+          </div></section>
+          <section aria-label={`${languageInfo?.name} words`}><h3>{languageInfo?.name}</h3><div className="match-column">
+            {oshiWords.map(word => <button type="button" key={word} data-match-side="native" data-word={word}
+              aria-label={`${languageInfo?.name}: ${word}${isOshiMatched(word) ? ", matched" : ""}`} aria-pressed={selectedOshi === word} disabled={isOshiMatched(word)}
+              onClick={() => chooseNative(word)} className={cn("match-tile", isOshiMatched(word) && "is-matched", selectedOshi === word && !isOshiMatched(word) && "is-selected")}>
+              <span>{word}</span>{isOshiMatched(word) && <span className="match-check" aria-hidden="true">✓</span>}
+            </button>)}
+          </div></section>
         </div>
       </div>
     </div>
   );
 }
-

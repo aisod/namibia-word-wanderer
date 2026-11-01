@@ -27,7 +27,8 @@ const original=[1,2,3,4];for(let i=0;i<100;i++)assert.deepEqual(shuffle(original
 console.log(`${count} vocabulary and Unicode assertions passed`);
 
 const catalogModule = ts.transpileModule(fs.readFileSync('src/data/languageCatalog.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-const catalog = {exports:{}}; new Function('exports','require',catalogModule)(catalog.exports,require);
+const profiles = {exports:{}}; new Function('exports',ts.transpileModule(fs.readFileSync('src/data/languageProfiles.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(profiles.exports);
+const catalog = {exports:{}}; new Function('exports','require',catalogModule)(catalog.exports,id=>id==='./languageProfiles'?profiles.exports:require(id));
 assert.equal(catalog.exports.getLocalLanguage('oshikwanyama').slug,'oshikwanyama');
 assert.equal(catalog.exports.getLocalLanguage('oshindonga').slug,'oshindonga');
 assert.equal(catalog.exports.getLocalLanguage('kwangari').slug,'rukwangali');
@@ -35,3 +36,13 @@ assert.equal(catalog.exports.LOCAL_LANGUAGES.length,6);
 assert.ok(catalog.exports.LOCAL_LANGUAGES.every(l=>l.isAvailable&&l.wordCount>=4));
 assert.deepEqual(catalog.exports.LOCAL_LANGUAGES.filter(l=>!l.isAvailable).map(l=>l.slug),[]);
 console.log('Separate Oshiwambo routes and six-language catalog checks passed');
+
+for(const language of catalog.exports.LOCAL_LANGUAGES){
+ assert.ok(language.description.length>200,language.slug+' lacks an introduction');
+ assert.ok(language.history.length>450,language.slug+' lacks history and culture');
+ assert.ok(language.geography.length>150,language.slug+' lacks geographic detail');
+ assert.ok(language.regions.includes('Namibia'),language.slug+' omits Namibia');
+ assert.ok(language.funFacts.length>=3);
+ assert.ok(!/Wiktionary|Hai ti|starter pack|source-backed|translated by/i.test(language.description+' '+language.history));
+}
+console.log('All six researched language profiles have substantive cultural and geographic content');

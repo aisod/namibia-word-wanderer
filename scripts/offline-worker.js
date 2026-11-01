@@ -15,6 +15,7 @@ self.addEventListener('activate', event => {
   })());
 });
 self.addEventListener('message', event => {
+  if (event.data === 'ACTIVATE_UPDATE') { event.waitUntil(self.skipWaiting()); return; }
   if (event.data === 'OFFLINE_STATUS') event.ports[0]?.postMessage({ ready: true });
 });
 self.addEventListener('fetch', event => {

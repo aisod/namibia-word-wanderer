@@ -4,6 +4,7 @@ import { BookOpen, Home, Users, Monitor, Smartphone, ArrowLeft } from "lucide-re
 import { MobileSupport } from "./MobileSupport";
 import { getLocalLanguage } from "@/data/languageCatalog";
 import "@/app-shell.css";
+import "@/experience.css";
 
 function readTVMode() { try { return localStorage.getItem("namqula-tv") === "true"; } catch { return false; } }
 export function AppShell({ children }: { children: ReactNode }) {
@@ -47,22 +48,23 @@ export function AppShell({ children }: { children: ReactNode }) {
     return () => document.removeEventListener("keydown",move);
   }, [tv, navigate, location.pathname]);
   useEffect(() => { if (location.hash === "#languages") document.getElementById("languages")?.scrollIntoView({block: "start"}); }, [location.pathname, location.hash]);
+  const isActive = (to: string) => to === "/community" ? location.pathname.startsWith(to) : to === "/#languages" ? location.hash === "#languages" || location.pathname.startsWith("/language/") : location.pathname === "/" && location.hash !== "#languages";
   const links=[{to:"/",label:"Learn",icon:Home},{to:"/#languages",label:"Languages",icon:BookOpen},{to:"/community",label:"Community",icon:Users}];
   if (admin) return <>{children}</>;
   return <div className={`app-shell ${game ? "is-game" : ""}`}>
     <a className="skip-link" href="#app-content">Skip to content</a>
     <aside className="app-rail" aria-label="Main navigation">
       <Link className="app-brand" to="/"><img src="/logo.webp" alt=""/><span>NAMQULA<small>Learn through play</small></span></Link>
-      <nav>{links.map(({to,label,icon:Icon})=><Link key={label} to={to} aria-current={(to==="/community"?location.pathname.startsWith(to):to==="/"&&location.pathname==="/")?"page":undefined}><Icon aria-hidden="true"/><span>{label}</span></Link>)}</nav>
+      <nav>{links.map(({to,label,icon:Icon})=><Link key={label} to={to} aria-current={isActive(to)?"page":undefined}><Icon aria-hidden="true"/><span>{label}</span></Link>)}</nav>
       <button className="display-toggle" onClick={()=>setTV(!tv)} aria-pressed={tv}>{tv?<Smartphone/>:<Monitor/>}<span>{tv?"Standard display":"TV / remote mode"}</span></button>
       <p className="rail-note">{tv?"Use arrow keys to move. Press OK / Enter to select.":"Your language. Your pace."}</p>
     </aside>
     <header className="app-topbar">
-      {location.pathname!=="/"?<button onClick={()=>navigate(game?`/language/${course?.slug??"oshikwanyama"}`:"/")} aria-label="Back"><ArrowLeft/></button>:<img src="/logo.webp" alt="NAMQULA"/>}
+      {location.pathname!=="/"?<button onClick={()=>navigate(game && location.search ? location.pathname : "/")} aria-label={game && location.search ? "Back to games" : "Back to language library"}><ArrowLeft/></button>:<img src="/logo.webp" alt="NAMQULA"/>}
       <span>{course?.name??"NAMQULA"}</span>
-      <button onClick={()=>setTV(!tv)} aria-pressed={tv} aria-label={tv?"Use standard display":"Use TV and remote display"}><Monitor/></button>
+      {course ? <Link className="topbar-info" to={`/language/${course.slug}`} aria-label={`About ${course.name}`}><BookOpen aria-hidden="true"/></Link> : <span className="topbar-spacer"/>}
     </header>
-    <main id="app-content" className="app-content" tabIndex={-1}><MobileSupport />{children}<footer className="corpus-credit"><a href="https://corpus.aisod.tech" target="_blank" rel="noopener noreferrer">AISOD Corpus of Language Data</a><p>With thanks to all its contributors. Preserving our languages, cultures and knowledge together.</p><a href="https://corpus.aisod.tech" target="_blank" rel="noopener noreferrer">Help grow the corpus</a></footer></main>
-    <nav className="app-bottom-nav" aria-label="Main navigation">{links.map(({to,label,icon:Icon})=><Link key={label} to={to} aria-current={(to==="/community"?location.pathname.startsWith(to):to==="/"&&location.pathname==="/")?"page":undefined}><Icon aria-hidden="true"/><span>{label}</span></Link>)}</nav>
+    <main id="app-content" className="app-content" tabIndex={-1}>{children}{location.pathname === "/" && <MobileSupport />}{!game && <footer className="corpus-credit"><a href="https://corpus.aisod.tech" target="_blank" rel="noopener noreferrer">AISOD Corpus of Language Data</a><p>With thanks to all its contributors. Preserving our languages, cultures and knowledge together.</p><a href="https://corpus.aisod.tech" target="_blank" rel="noopener noreferrer">Help grow the corpus</a></footer>}</main>
+    <nav className="app-bottom-nav" aria-label="Main navigation">{links.map(({to,label,icon:Icon})=><Link key={label} to={to} aria-current={isActive(to)?"page":undefined}><Icon aria-hidden="true"/><span>{label}</span></Link>)}</nav>
   </div>;
 }

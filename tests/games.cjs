@@ -43,21 +43,24 @@ async function main(){
     act(()=>answers[0].props.onClick());assert.ok(snapshot(renderer).includes('Next')||snapshot(renderer).includes('Continue'));checks++;
    }
    if(name==='WordMatchGame'){
-    const choices=()=>renderer.root.findAll(n=>n.type==='div'&&n.props.role==='button');
-    const englishChoices=choices().filter(n=>words.some(w=>w.english===n.children.join('')));
-    const english=englishChoices[0].children.join('');const translation=words.find(w=>w.english===english).oshikwanyama;
+    const choices=()=>renderer.root.findAll(n=>n.type==='button'&&n.props['data-match-side']);
+    const englishChoices=choices().filter(n=>n.props['data-match-side']==='english');
+    const english=englishChoices[0].props['data-word'];const translation=words.find(w=>w.english===english).oshikwanyama;
     act(()=>englishChoices[0].props.onClick());
-    act(()=>choices().find(n=>n.children.join('')===translation).props.onClick());
-    assert.equal(toastCount,1);checks++;
+    act(()=>choices().find(n=>n.props['data-match-side']==='native'&&n.props['data-word']===translation).props.onClick());
+    assert.equal(toastCount,0);assert.ok(snapshot(renderer).includes("Total: 10"));checks+=2;
+    assert.equal(choices().filter(n=>n.props.disabled).length,2,'Matched tiles must be disabled on both sides');checks++;
+    assert.ok(snapshot(renderer).includes('Matched:'),'Matching needs readable feedback');checks++;
+    assert.ok(choices().length<=12,'A round must not exceed six pairs');checks++;
     await act(async()=>{await new Promise(resolve=>setTimeout(resolve,550));});
-    assert.equal(toastCount,1);assert.ok(snapshot(renderer).length>20);checks+=2;toastCount=0;
+    assert.equal(toastCount,0);assert.ok(snapshot(renderer).includes("Total: 10"));checks+=2;toastCount=0;
    }
    if(name==='WordSearchGame'){
     const buttons=renderer.root.findAllByType('button').filter(b=>b.props['aria-label']?.startsWith('Row '));
     assert.equal(buttons.length,64);checks++;
     assert.ok(buttons.every(b=>!b.props.disabled));checks++;
     const grid=Array.from({length:8},(_,row)=>buttons.slice(row*8,row*8+8).map(b=>b.children.join('')));
-    const labels=snapshot(renderer);const targets=words.filter(w=>labels.includes(w.oshikwanyama)&&util.gridLetters(w.oshikwanyama).length>=3);
+    const labels=snapshot(renderer);const targets=words.filter(w=>renderer.root.findAll(n=>n.type==='span'&&n.children.length===1&&n.children[0]===w.oshikwanyama).length&&util.gridLetters(w.oshikwanyama).length>=3).sort((a,b)=>util.gridLetters(a.oshikwanyama).length-util.gridLetters(b.oshikwanyama).length);
     let positions;
     outer:for(const word of targets){const letters=util.gridLetters(word.oshikwanyama);for(let row=0;row<8;row++)for(let col=0;col<8;col++)for(const [dr,dc] of [[0,1],[1,0]]){
      const cells=letters.map((_,i)=>[row+dr*i,col+dc*i]);if(cells.every(([rr,cc],i)=>grid[rr]?.[cc]===letters[i])){positions=cells;break outer;}
