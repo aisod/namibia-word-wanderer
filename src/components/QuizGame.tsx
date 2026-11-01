@@ -1,3 +1,5 @@
+import { makeOptions } from "@/lib/vocabularyUtils";
+import { VocabularyStatus } from "./VocabularyStatus";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -22,7 +24,7 @@ interface Question {
 }
 
 export function QuizGame({ languageId, onBack }: QuizGameProps) {
-  const { getRandomVocabulary, allVocabulary, isLoading } = useLanguageData(languageId);
+  const { getRandomVocabulary, allVocabulary, isLoading, error, retry, languageInfo } = useLanguageData(languageId);
   const [level, setLevel] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -42,14 +44,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
       const isEnglishToOshi = Math.random() > 0.5;
       const correctAnswer = isEnglishToOshi ? word.oshikwanyama : word.english;
       
-      // Get 3 wrong options
-      const otherWords = allVocabulary.filter(w => w.id !== word.id);
-      const shuffled = otherWords.sort(() => Math.random() - 0.5);
-      const wrongOptions = shuffled
-        .slice(0, 3)
-        .map(w => isEnglishToOshi ? w.oshikwanyama : w.english);
-      
-      const options = [...wrongOptions, correctAnswer].sort(() => Math.random() - 0.5);
+      const options = makeOptions(word, allVocabulary, isEnglishToOshi);
 
       return {
         word,
@@ -75,7 +70,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
   }, [level, isLoading]);
 
   const handleAnswer = (answer: string) => {
-    if (isAnswered) return;
+    if (isAnswered || gameOver) return;
     
     setSelectedAnswer(answer);
     setIsAnswered(true);
@@ -85,13 +80,9 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
     if (answer === currentQuestion.correctAnswer) {
       setScore(prev => prev + levelConfig.pointsPerWord);
     } else {
-      setLives(prev => {
-        const newLives = prev - 1;
-        if (newLives === 0) {
-          setTimeout(() => setGameOver(true), 1000);
-        }
-        return newLives;
-      });
+      const remaining = lives - 1;
+      setLives(remaining);
+      if (remaining === 0) setGameOver(true);
     }
   };
 
@@ -107,6 +98,8 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
       }
     }
   };
+
+  if (!isLoading && (error || allVocabulary.length < 4)) return <VocabularyStatus error={error} onRetry={retry} onBack={onBack} />;
 
   if (isLoading) {
     return (
@@ -217,7 +210,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
     );
   }
 
-  if (!questions[currentIndex]) return null;
+  if (!questions[currentIndex]) return <p role="status" className="p-6">Preparing questions…</p>;
 
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex) / questions.length) * 100;
@@ -267,7 +260,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
           
           <p className="text-sm text-muted-foreground mb-3">
             {currentQuestion.isEnglishToOshi 
-              ? "What is the Oshikwanyama word for..."
+              ? `What is the ${languageInfo?.name ?? "translation"} word for…`
               : "What does this mean in English..."}
           </p>
           
@@ -281,7 +274,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
         {/* Options */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
           {currentQuestion.options.map((option, index) => (
-            <Card
+            <button type="button" aria-label={`Answer: ${option}`} disabled={isAnswered}
               key={option}
               onClick={() => handleAnswer(option)}
               className={cn(
@@ -301,7 +294,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
                   <XCircle className="w-5 h-5 text-destructive" />
                 )}
               </div>
-            </Card>
+            </button>
           ))}
         </div>
 
@@ -315,3 +308,4 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
     </div>
   );
 }
+

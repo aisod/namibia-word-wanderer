@@ -7,6 +7,12 @@ export interface VocabularyItem {
   id: string;
   english: string;
   oshikwanyama: string; // native translation (kept for backward compatibility)
+  sourceUrl?: string;
+  corpusAttribution?: string;
+  corpusUrl?: string;
+  license?: string;
+  sourceRecordId?: string;
+  reviewStatus?: string;
   category: string;
   difficulty: "easy" | "medium" | "hard";
 }
@@ -30,3 +36,4 @@ export interface CategoryInfo {
 }
 
 export type AppRole = "admin" | "moderator" | "language_register";
+

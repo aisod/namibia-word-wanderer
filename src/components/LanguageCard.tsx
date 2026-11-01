@@ -27,6 +27,8 @@ export function LanguageCard({
 }: LanguageCardProps) {
   return (
     <Card
+      role="button" tabIndex={isAvailable ? 0 : -1} aria-disabled={!isAvailable}
+      onKeyDown={event => { if (isAvailable && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); onClick(); } }}
       onClick={isAvailable ? onClick : undefined}
       className={cn(
         "relative overflow-hidden p-6 md:p-8 transition-all duration-300 cursor-pointer",
@@ -57,7 +59,7 @@ export function LanguageCard({
       {/* Coming soon badge */}
       {!isAvailable && (
         <Badge variant="secondary" className="absolute top-4 right-4 bg-muted">
-          Coming Soon
+          In preparation
         </Badge>
       )}
 
@@ -129,3 +131,4 @@ export function LanguageCard({
     </Card>
   );
 }
+

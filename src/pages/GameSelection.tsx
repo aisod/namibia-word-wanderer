@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { getLocalLanguage } from "@/data/languageCatalog";
+import { lazy, Suspense, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { GameCard } from "@/components/GameCard";
-import { FlashcardGame } from "@/components/FlashcardGame";
-import { WordMatchGame } from "@/components/WordMatchGame";
-import { QuizGame } from "@/components/QuizGame";
-import { WordSearchGame } from "@/components/WordSearchGame";
-import { ArrowLeft } from "lucide-react";
+const FlashcardGame = lazy(() => import("@/components/FlashcardGame").then(m => ({ default: m.FlashcardGame })));
+const WordMatchGame = lazy(() => import("@/components/WordMatchGame").then(m => ({ default: m.WordMatchGame })));
+const QuizGame = lazy(() => import("@/components/QuizGame").then(m => ({ default: m.QuizGame })));
+const WordSearchGame = lazy(() => import("@/components/WordSearchGame").then(m => ({ default: m.WordSearchGame })));
+import { ArrowLeft, Layers, Link2, CircleHelp, Search } from "lucide-react";
 
 type GameType = "flashcards" | "wordmatch" | "quiz" | "wordsearch" | null;
 
@@ -15,15 +16,22 @@ export default function GameSelection() {
   const { languageId } = useParams();
   const [activeGame, setActiveGame] = useState<GameType>(null);
 
-  if (activeGame === "flashcards") return <FlashcardGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} />;
-  if (activeGame === "wordmatch") return <WordMatchGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} />;
-  if (activeGame === "quiz") return <QuizGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} />;
-  if (activeGame === "wordsearch") return <WordSearchGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} />;
+  const course = getLocalLanguage(languageId);
+  if (course && !course.isAvailable) return <div className="min-h-screen grid place-items-center p-6"><div className="text-center space-y-4">
+    <h1 className="text-2xl font-semibold">{course.name} is in preparation</h1>
+    <p>Vocabulary is being checked before these games are enabled.</p>
+    <Button onClick={() => navigate("/")}>Choose another language</Button>
+  </div></div>;
+
+  if (activeGame === "flashcards") return <Suspense fallback={<p role="status">Loading game…</p>}><FlashcardGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} /></Suspense>;
+  if (activeGame === "wordmatch") return <Suspense fallback={<p role="status">Loading game…</p>}><WordMatchGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} /></Suspense>;
+  if (activeGame === "quiz") return <Suspense fallback={<p role="status">Loading game…</p>}><QuizGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} /></Suspense>;
+  if (activeGame === "wordsearch") return <Suspense fallback={<p role="status">Loading game…</p>}><WordSearchGame languageId={languageId ?? "oshikwanyama"} onBack={() => setActiveGame(null)} /></Suspense>;
 
   return (
     <div className="min-h-screen">
       <section className="relative min-h-screen py-6 sm:py-8 md:py-12 lg:py-20">
-        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/heroimage.jpg)' }}>
+        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: 'url(/heroimage.webp)' }}>
           <div className="absolute inset-0 bg-black/50" />
         </div>
 
@@ -49,10 +57,10 @@ export default function GameSelection() {
           <div className="max-w-4xl mx-auto">
             {/* Game Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-              <GameCard title="Flashcards" description="Learn vocabulary at your own pace with interactive flashcards. Flip to reveal translations!" iconImage="/flashcards.png" difficulty="Easy" color="orange" onClick={() => setActiveGame("flashcards")} />
-              <GameCard title="Word Match" description="Test your memory by matching English words with their Oshikwanyama translations." iconImage="/wordmatch.png" difficulty="Medium" color="pink" onClick={() => setActiveGame("wordmatch")} />
-              <GameCard title="Quiz Challenge" description="Put your knowledge to the test! Answer questions before you run out of lives." iconImage="/quizchallenge.png" difficulty="Hard" color="green" onClick={() => setActiveGame("quiz")} />
-              <GameCard title="Word Search" description="Find hidden words in a grid of letters. Click letters in sequence to form words!" iconImage="/wordsearch.png" difficulty="Medium" color="blue" onClick={() => setActiveGame("wordsearch")} />
+              <GameCard title="Flashcards" description="Learn vocabulary at your own pace with interactive flashcards. Flip to reveal translations!" icon={Layers} difficulty="Easy" color="orange" onClick={() => setActiveGame("flashcards")} />
+              <GameCard title="Word Match" description="Test your memory by matching English words with their translations." icon={Link2} difficulty="Medium" color="pink" onClick={() => setActiveGame("wordmatch")} />
+              <GameCard title="Quiz Challenge" description="Put your knowledge to the test! Answer questions before you run out of lives." icon={CircleHelp} difficulty="Hard" color="green" onClick={() => setActiveGame("quiz")} />
+              <GameCard title="Word Search" description="Find hidden words in a grid of letters. Click letters in sequence to form words!" icon={Search} difficulty="Medium" color="blue" onClick={() => setActiveGame("wordsearch")} />
             </div>
 
             {/* Tips */}
@@ -71,3 +79,4 @@ export default function GameSelection() {
     </div>
   );
 }
+

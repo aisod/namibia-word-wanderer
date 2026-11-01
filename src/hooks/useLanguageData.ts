@@ -1,85 +1,42 @@
 import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useLanguages } from "./useLanguages";
 import { useVocabulary } from "./useVocabulary";
-import { useCategories } from "./useCategories";
-import {
-  oshikwanyamaInfo,
-  allVocabulary,
-  categories as staticCategories,
-  getVocabularyByCategory,
-  getRandomVocabulary as getStaticRandomVocabulary,
-} from "@/data/oshikwanyamaData";
-import type { LanguageInfo, VocabularyItem, CategoryInfo } from "@/lib/languageTypes";
-
-/**
- * Unified language data hook.
- * Fetches from database; falls back to static oshikwanyamaData when DB is empty or fails.
- */
+import { getLocalLanguage, resolveLanguageSlug } from "@/data/languageCatalog";
+import { shuffle, uniqueVocabulary } from "@/lib/vocabularyUtils";
+import type { VocabularyItem, CategoryInfo } from "@/lib/languageTypes";
+const EMPTY: VocabularyItem[] = [];
+const categoryNames: Record<string, string> = { animals: "Animals", body: "Body", family: "People & family", nature: "Nature", food: "Food", numbers: "Numbers", verbs: "Actions", everyday: "Everyday words", qualities: "Describing things", pronouns: "Pronouns", greetings: "Greetings", household: "Home & cooking", clothing: "Clothing" };
 export function useLanguageData(languageSlug: string | undefined) {
-  const { data: languages, isLoading: loadingLangs } = useLanguages();
-  const language = useMemo(
-    () => languages?.find((l) => l.slug === languageSlug),
-    [languages, languageSlug]
-  );
-  const languageId = language?.id;
-
-  const { data: vocabulary = [], isLoading: loadingVocab } = useVocabulary(languageId);
-  const { data: categories = [], isLoading: loadingCats } = useCategories(languageId);
-
-  const useFallback = !languageId || vocabulary.length === 0;
-
-  const languageInfo: LanguageInfo | null = useMemo(() => {
-    if (!languageSlug) return null;
-    if (language && !useFallback) {
-      return {
-        name: language.name,
-        nativeName: language.nativeName,
-        speakers: language.speakers,
-        regions: language.regions,
-        description: language.description,
-        history: language.history,
-        funFacts: language.funFacts,
-        coverImage: language.coverImage ?? "/oshiwambo.png",
-      };
-    }
-    if (languageSlug === "oshikwanyama") return { ...oshikwanyamaInfo, coverImage: "/oshiwambo.png" };
-    return null;
-  }, [language, languageSlug, useFallback]);
-
-  const allVocab: VocabularyItem[] = useMemo(() => {
-    if (useFallback && languageSlug === "oshikwanyama") return allVocabulary;
-    return vocabulary;
-  }, [vocabulary, useFallback, languageSlug]);
-
-  const cats: CategoryInfo[] = useMemo(() => {
-    if (useFallback && languageSlug === "oshikwanyama") return staticCategories;
-    return categories;
-  }, [categories, useFallback, languageSlug]);
-
-  const getVocabularyByCat = (categoryId: string): VocabularyItem[] => {
-    if (useFallback && languageSlug === "oshikwanyama") return getVocabularyByCategory(categoryId);
-    return categoryId === "all"
-      ? allVocab
-      : allVocab.filter((v) => v.category === categoryId);
-  };
-
-  const getRandomVocabulary = (count: number, category?: string): VocabularyItem[] => {
-    if (useFallback && languageSlug === "oshikwanyama") {
-      return getStaticRandomVocabulary(count, category);
-    }
-    const source = category ? getVocabularyByCat(category) : allVocab;
-    const shuffled = [...source].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, Math.min(count, shuffled.length));
-  };
-
-  return {
-    languageInfo,
-    allVocabulary: allVocab,
-    categories: cats,
-    getVocabularyByCategory: getVocabularyByCat,
-    getRandomVocabulary,
-    isLoading: loadingLangs || loadingVocab || loadingCats,
-    useFallback,
-    languageId,
+  const slug = resolveLanguageSlug(languageSlug);
+  const local = getLocalLanguage(slug);
+  const playableLocal = local?.isAvailable ? local : undefined;
+  const { data: languages, isLoading: loadingLanguages, error: languageError } = useLanguages(!local);
+  const language = local ?? languages?.find(l => l.slug === slug);
+  const database = useVocabulary(local ? undefined : language?.id);
+  const pack = useQuery({
+    queryKey: ["language-pack", slug, 1], enabled: !!playableLocal,
+    queryFn: async ({ signal }) => {
+      const response = await fetch(`/data/${local!.slug}.json`, { signal });
+      if (!response.ok) throw new Error("Vocabulary could not be loaded. Please try again.");
+      const data: unknown = await response.json();
+      if (!Array.isArray(data) || !data.every(v => typeof v.id === "string" && typeof v.english === "string" && typeof v.oshikwanyama === "string" && typeof v.category === "string")) throw new Error("Invalid vocabulary pack");
+      return data as VocabularyItem[];
+    }, staleTime: Infinity, gcTime: 24 * 60 * 60 * 1000, retry: 1,
+  });
+  const allVocabulary = useMemo(() => uniqueVocabulary((local ? pack.data : database.data) ?? EMPTY), [local, pack.data, database.data]);
+  // Count the data already loaded; do not download the vocabulary a second time.
+  const categories = useMemo(() => {
+    const counts = new Map<string, number>();
+    allVocabulary.forEach(v => counts.set(v.category, (counts.get(v.category) ?? 0) + 1));
+    return Array.from(counts, ([id, count]): CategoryInfo => ({ id, name: categoryNames[id] ?? id, icon: "📚", count }));
+  }, [allVocabulary]);
+  const getVocabularyByCategory = (id: string) => id === "all" ? allVocabulary : allVocabulary.filter(v => v.category === id);
+  return { languageInfo: language ?? null, allVocabulary, categories, getVocabularyByCategory,
+    getRandomVocabulary: (count: number, category?: string) => shuffle(category ? getVocabularyByCategory(category) : allVocabulary).slice(0, count),
+    isLoading: local ? pack.isLoading : loadingLanguages || (!!language && database.isLoading),
+    error: local ? pack.error : languageError ?? database.error,
+    retry: () => local ? pack.refetch() : database.refetch(),
+    useFallback: false, languageId: language?.id,
   };
 }

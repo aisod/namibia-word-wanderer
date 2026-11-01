@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { VocabularyStatus } from "./VocabularyStatus";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +22,7 @@ interface MatchPair {
 }
 
 export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
-  const { getRandomVocabulary, isLoading } = useLanguageData(languageId);
+  const { getRandomVocabulary, allVocabulary, isLoading, error, retry, languageInfo } = useLanguageData(languageId);
   const [level, setLevel] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
   const [pairs, setPairs] = useState<MatchPair[]>([]);
@@ -35,9 +36,15 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
   const [attempts, setAttempts] = useState(0);
   const [levelComplete, setLevelComplete] = useState(false);
 
+  const matchLock = useRef(false);
+  const clearTimer = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => () => clearTimeout(clearTimer.current), []);
+
   const levelConfig = getLevelConfig(level, 'wordmatch');
 
   const startGame = () => {
+    clearTimeout(clearTimer.current);
+    matchLock.current = false;
     const vocab = getRandomVocabulary(levelConfig.wordCount);
     const gamePairs = vocab.map(v => ({
       id: v.id,
@@ -62,46 +69,33 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [level, isLoading]);
 
-  useEffect(() => {
-    if (selectedEnglish && selectedOshi) {
-      const pair = pairs.find(p => p.english === selectedEnglish && p.oshikwanyama === selectedOshi);
-      
-      setAttempts(prev => prev + 1);
-      
-      if (pair) {
-        // Correct match!
-        const newMatched = new Set(matchedPairs);
-        newMatched.add(pair.id);
-        setMatchedPairs(newMatched);
-        setScore(prev => prev + (levelConfig.pointsPerWord * (streak + 1)));
-        setStreak(prev => prev + 1);
-        
-        toast({
-          title: "🎉 Correct!",
-          description: `${pair.english} = ${pair.oshikwanyama}`,
-          duration: 1500,
-        });
-
-        if (newMatched.size === pairs.length) {
-          setLevelComplete(true);
-        }
-      } else {
-        // Wrong match
-        setStreak(0);
-        toast({
-          title: "❌ Try again!",
-          description: "That's not a match",
-          variant: "destructive",
-          duration: 1500,
-        });
-      }
-
-      setTimeout(() => {
-        setSelectedEnglish(null);
-        setSelectedOshi(null);
-      }, 500);
+  const resolveMatch = (english: string, native: string) => {
+    if (matchLock.current) return;
+    matchLock.current = true;
+    const pair = pairs.find(p => p.english === english && p.oshikwanyama === native);
+    setAttempts(prev => prev + 1);
+    if (pair && !matchedPairs.has(pair.id)) {
+      const next = new Set(matchedPairs); next.add(pair.id);
+      setMatchedPairs(next);
+      setScore(prev => prev + levelConfig.pointsPerWord * (streak + 1));
+      setStreak(prev => prev + 1);
+      toast({ title: "Correct!", description: `${pair.english} = ${pair.oshikwanyama}`, duration: 1500 });
+      if (next.size === pairs.length) setLevelComplete(true);
+    } else {
+      setStreak(0); toast({ title: "Try again", description: "That’s not a match", duration: 1500 });
     }
-  }, [selectedEnglish, selectedOshi, pairs, matchedPairs, streak, levelConfig.pointsPerWord]);
+    clearTimer.current = setTimeout(() => {
+      setSelectedEnglish(null); setSelectedOshi(null); matchLock.current = false;
+    }, 500);
+  };
+  const chooseEnglish = (word: string) => {
+    if (matchLock.current || isEnglishMatched(word)) return;
+    setSelectedEnglish(word); if (selectedOshi) resolveMatch(word, selectedOshi);
+  };
+  const chooseNative = (word: string) => {
+    if (matchLock.current || isOshiMatched(word)) return;
+    setSelectedOshi(word); if (selectedEnglish) resolveMatch(selectedEnglish, word);
+  };
 
   const isEnglishMatched = (word: string) => {
     const pair = pairs.find(p => p.english === word);
@@ -114,6 +108,8 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
   };
 
   const progress = pairs.length > 0 ? (matchedPairs.size / pairs.length) * 100 : 0;
+
+  if (!isLoading && (error || allVocabulary.length < 1)) return <VocabularyStatus error={error} onRetry={retry} onBack={onBack} />;
 
   if (isLoading) {
     return (
@@ -224,7 +220,7 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
             Word Match
           </h2>
           <p className="text-muted-foreground">
-            Match the English words with their Oshikwanyama translations
+            Match the English words with their {languageInfo?.name} translations
           </p>
         </div>
 
@@ -242,7 +238,9 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
               {englishWords.map((word) => (
                 <Card
                   key={word}
-                  onClick={() => !isEnglishMatched(word) && setSelectedEnglish(word)}
+                  role="button" tabIndex={0}
+                  onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }}
+                  onClick={() => chooseEnglish(word)}
                   className={cn(
                     "p-4 cursor-pointer transition-all duration-200 text-center font-medium",
                     isEnglishMatched(word) && "bg-success/20 border-success opacity-60 cursor-default",
@@ -259,13 +257,15 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
           {/* Oshikwanyama Column */}
           <div>
             <h3 className="font-display text-lg text-center mb-4 text-muted-foreground">
-              Oshikwanyama
+              {languageInfo?.name}
             </h3>
             <div className="space-y-3">
               {oshiWords.map((word) => (
                 <Card
                   key={word}
-                  onClick={() => !isOshiMatched(word) && setSelectedOshi(word)}
+                  role="button" tabIndex={0}
+                  onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.currentTarget.click(); } }}
+                  onClick={() => chooseNative(word)}
                   className={cn(
                     "p-4 cursor-pointer transition-all duration-200 text-center font-medium",
                     isOshiMatched(word) && "bg-success/20 border-success opacity-60 cursor-default",
@@ -283,3 +283,4 @@ export function WordMatchGame({ languageId, onBack }: WordMatchGameProps) {
     </div>
   );
 }
+

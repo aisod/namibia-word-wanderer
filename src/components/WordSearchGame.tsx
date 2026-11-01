@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { gridLetters } from "@/lib/vocabularyUtils";
+import { VocabularyStatus } from "./VocabularyStatus";
+import { useState, useEffect, type CSSProperties } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +25,7 @@ interface WordPosition {
 }
 
 export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
-  const { getRandomVocabulary, allVocabulary, isLoading } = useLanguageData(languageId);
+  const { getRandomVocabulary, allVocabulary, isLoading, error, retry, languageInfo } = useLanguageData(languageId);
   const [level, setLevel] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
   const [grid, setGrid] = useState<string[][]>([]);
@@ -65,7 +67,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
 
   // Place word in grid - returns positions array or null
   const placeWord = (grid: string[][], word: string, direction: 'horizontal' | 'vertical'): Array<{ row: number; col: number }> | null => {
-    const wordUpper = word.toUpperCase().replace(/[^A-Z]/g, '');
+    const wordUpper = gridLetters(word);
     if (wordUpper.length === 0 || wordUpper.length > GRID_SIZE) return null;
 
     const maxAttempts = 100;
@@ -130,7 +132,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
     
     // Filter words - Oshikwanyama words must fit in the grid
     let suitableWords = vocabularyPool.filter(v => {
-      const oshiLen = v.oshikwanyama.replace(/[^A-Z]/gi, '').length;
+      const oshiLen = gridLetters(v.oshikwanyama).length;
       // Oshikwanyama word must fit in the grid (at least 3 characters, max grid size)
       return oshiLen >= 3 && oshiLen <= maxWordLength;
     });
@@ -138,7 +140,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
     // If we don't have enough suitable words from the random pool, fall back to all vocabulary
     if (suitableWords.length < targetCount) {
       const fallbackSuitable = allVocabulary.filter(v => {
-        const oshiLen = v.oshikwanyama.replace(/[^A-Z]/gi, '').length;
+        const oshiLen = gridLetters(v.oshikwanyama).length;
         return oshiLen >= 3 && oshiLen <= maxWordLength;
       });
       // Shuffle and combine with what we have
@@ -265,59 +267,29 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
   };
 
   useEffect(() => {
-    if (!isLoading) startGame();
+    if (!isLoading && allVocabulary.length > 0) startGame();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [level, isLoading]);
 
   const handleCellClick = (row: number, col: number) => {
-    if (isCellInFoundWord(row, col)) return;
-    
-    setSelectedCells(prev => {
-      const newSelection = [...prev, { row, col }];
-      
-      // Check if selected cells form a word (minimum 3 letters)
-      if (newSelection.length >= 3) {
-        // Check against all words
-        words.forEach((wordPos) => {
-          if (foundWords.has(wordPos.word.id)) return;
-          
-          // Check if selection matches word positions (forward or reverse)
-          const wordPositionsStr = wordPos.positions.map(p => `${p.row},${p.col}`).sort().join('|');
-          const selectedStr = newSelection.map(p => `${p.row},${p.col}`).sort().join('|');
-          const selectedReverseStr = [...newSelection].reverse().map(p => `${p.row},${p.col}`).sort().join('|');
-          
-          if (wordPositionsStr === selectedStr || wordPositionsStr === selectedReverseStr) {
-            // Found a word!
-            const newFound = new Set([...foundWords, wordPos.word.id]);
-            setFoundWords(newFound);
-            setScore(prev => prev + levelConfig.pointsPerWord);
-            setSelectedWordId(null);
-            
-            // Show popup with English meaning
-            toast({
-              title: `🎉 ${wordPos.word.oshikwanyama} Found!`,
-              description: `English: ${wordPos.word.english}`,
-              duration: 3000,
-            });
-
-            // Check if level complete
-            if (newFound.size >= words.length) {
-              setLevelComplete(true);
-            }
-            
-            return [];
-          }
-        });
-      }
-      
-      // Update selected word ID for color coding
-      if (newSelection.length > 0) {
-        const wordId = getSelectedWordId(row, col);
-        setSelectedWordId(wordId);
-      }
-      
-      return newSelection;
-    });
+    // Shared letters remain selectable after finding an intersecting word.
+    const cell = { row, col };
+    let selection = [...selectedCells, cell];
+    if (selectedCells.some(p => p.row === row && p.col === col)) { clearSelection(); return; }
+    if (selectedCells.length) {
+      const first = selectedCells[0]; const last = selectedCells[selectedCells.length - 1];
+      const adjacent = Math.abs(last.row - row) + Math.abs(last.col - col) === 1;
+      const straight = selection.every(p => p.row === first.row) || selection.every(p => p.col === first.col);
+      if (!adjacent || !straight) selection = [cell];
+    }
+    const same = (a: typeof selection, b: typeof selection) => a.length === b.length && a.every((p, i) => p.row === b[i].row && p.col === b[i].col);
+    const found = words.find(w => !foundWords.has(w.word.id) && (same(selection, w.positions) || same(selection, [...w.positions].reverse())));
+    if (found) {
+      const next = new Set(foundWords); next.add(found.word.id);
+      setFoundWords(next); setScore(score + levelConfig.pointsPerWord);
+      toast({ title: `${found.word.oshikwanyama} found!`, description: `English: ${found.word.english}`, duration: 3000 });
+      clearSelection(); if (next.size === words.length) setLevelComplete(true);
+    } else { setSelectedCells(selection); setSelectedWordId(null); }
   };
 
   const clearSelection = () => {
@@ -408,6 +380,8 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
   };
 
   const progress = words.length > 0 ? (foundWords.size / words.length) * 100 : 0;
+
+  if (!isLoading && (error || allVocabulary.length < 1)) return <VocabularyStatus error={error} onRetry={retry} onBack={onBack} />;
 
   if (isLoading) {
     return (
@@ -507,7 +481,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
             Word Search
           </h2>
           <p className="text-sm md:text-base text-muted-foreground">
-            Find the hidden Oshikwanyama words by tapping letters in sequence
+            Find the hidden {languageInfo?.name} words by tapping letters in sequence
           </p>
         </div>
 
@@ -577,7 +551,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
           </Card>
         ) : (
           <Card className="p-4 mb-4 text-center">
-            <p className="text-muted-foreground">Loading words...</p>
+            <p className="text-muted-foreground">No words fit this grid yet. Try another round or language.</p>
             <Button onClick={startGame} className="mt-4">
               Retry
             </Button>
@@ -587,7 +561,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
         {/* Grid */}
         {words.length > 0 && (
           <Card className="p-3 md:p-6 mb-6">
-            <div className="grid gap-1 md:gap-2 justify-center max-w-full mx-auto" style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))` }}>
+            <div className="wordsearch-viewport"><div className="wordsearch-board grid gap-1" style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`, "--grid-size": GRID_SIZE } as CSSProperties}>
               {grid.map((row, rowIndex) =>
                 row.map((cell, colIndex) => (
                   <button
@@ -611,23 +585,24 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
                         return "bg-secondary/50 hover:bg-secondary border border-border";
                       })()
                     )}
-                    disabled={isCellInFoundWord(rowIndex, colIndex)}
+                    aria-label={`Row ${rowIndex + 1}, column ${colIndex + 1}: ${cell}`}
                   >
                     {cell}
                   </button>
                 ))
               )}
-            </div>
+            </div></div>
           </Card>
         )}
 
         {/* Instructions */}
           <Card className="p-3 md:p-4 bg-primary/5 border-primary/20">
           <p className="text-xs md:text-sm text-center text-muted-foreground">
-            💡 Tap letters in order to form Oshikwanyama words. Words can be horizontal or vertical.
+            💡 Tap letters in order to form {languageInfo?.name} words. Words can be horizontal or vertical. On smaller screens, swipe across the board when needed.
           </p>
         </Card>
       </div>
     </div>
   );
 }
+
