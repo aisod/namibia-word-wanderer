@@ -23,3 +23,6 @@
 @media(prefers-reduced-motion:reduce){.course-tile:hover{transform:none;}}
 
 .game-screen h2,.game-screen h3{font-family:inherit;font-weight:800;}
+
+.wordsearch-feedback{padding:.65rem .85rem;margin-bottom:1rem;border-radius:.75rem;background:hsl(var(--success)/.1);border:1px solid hsl(var(--success)/.3);font-size:.9rem;line-height:1.5;}
+.is-game .app-content .match-tile{min-height:3.5rem;}

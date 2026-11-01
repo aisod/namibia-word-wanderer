@@ -67,7 +67,7 @@ async function main(){
     }}
     assert.ok(positions,'No complete target in grid');checks++;
     for(const [row,col] of positions)act(()=>renderer.root.findAllByType('button').filter(b=>b.props['aria-label']?.startsWith('Row '))[row*8+col].props.onClick());
-    assert.equal(toastCount,1);checks++;
+    assert.equal(toastCount,0);assert.ok(snapshot(renderer).includes("Found:"));checks+=2;
     assert.ok(renderer.root.findAllByType('button').filter(b=>b.props['aria-label']?.startsWith('Row ')).every(b=>!b.props.disabled),'Crossings became disabled');checks++;toastCount=0;
    }
    if(name==='FlashcardGame'){

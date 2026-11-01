@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import type { VocabularyItem } from "@/lib/languageTypes";
 import { useLanguageData } from "@/hooks/useLanguageData";
 import { ArrowLeft, Trophy, Search, RefreshCw, CheckCircle, Zap, TrendingUp } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 import { getLevelConfig, getDifficultyColor, getDifficultyLabel, type Difficulty } from "@/utils/gameUtils";
 
 interface WordSearchGameProps {
@@ -34,6 +33,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
   const [foundWords, setFoundWords] = useState<Set<string>>(new Set());
   const [selectedWordId, setSelectedWordId] = useState<string | null>(null); // Track which word is being selected
   const [score, setScore] = useState(0);
+  const [lastFound, setLastFound] = useState("");
   const [timeStarted, setTimeStarted] = useState<number>(0);
   const [gameComplete, setGameComplete] = useState(false);
   const [levelComplete, setLevelComplete] = useState(false);
@@ -261,6 +261,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
     setSelectedCells([]);
     setFoundWords(new Set());
     setScore(0);
+    setLastFound("");
     setTimeStarted(Date.now());
     setGameComplete(false);
     setLevelComplete(false);
@@ -292,7 +293,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
       const next = new Set(foundWords); next.add(found.word.id);
       setWords(previous => previous.map(w => w.word.id === found.word.id ? { ...w, positions: selection } : w));
       setFoundWords(next); setScore(score + levelConfig.pointsPerWord);
-      toast({ title: `${found.word.oshikwanyama} found!`, description: `English: ${found.word.english}`, duration: 3000 });
+      setLastFound(`${found.word.oshikwanyama} = ${found.word.english}`);
       clearSelection(); if (next.size === words.length) setLevelComplete(true);
     } else { setSelectedCells(selection); setSelectedWordId(null); }
   };
@@ -335,14 +336,14 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
 
   // Color array for different words (used for both selected and found)
   const wordColors = [
-    { selected: 'bg-blue-500/30 text-blue-700 border-blue-500 ring-blue-500', found: 'bg-blue-500 text-white border-blue-600 shadow-md' },
-    { selected: 'bg-purple-500/30 text-purple-700 border-purple-500 ring-purple-500', found: 'bg-purple-500 text-white border-purple-600 shadow-md' },
-    { selected: 'bg-pink-500/30 text-pink-700 border-pink-500 ring-pink-500', found: 'bg-pink-500 text-white border-pink-600 shadow-md' },
-    { selected: 'bg-orange-500/30 text-orange-700 border-orange-500 ring-orange-500', found: 'bg-orange-500 text-white border-orange-600 shadow-md' },
-    { selected: 'bg-cyan-500/30 text-cyan-700 border-cyan-500 ring-cyan-500', found: 'bg-cyan-500 text-white border-cyan-600 shadow-md' },
-    { selected: 'bg-indigo-500/30 text-indigo-700 border-indigo-500 ring-indigo-500', found: 'bg-indigo-500 text-white border-indigo-600 shadow-md' },
-    { selected: 'bg-teal-500/30 text-teal-700 border-teal-500 ring-teal-500', found: 'bg-teal-500 text-white border-teal-600 shadow-md' },
-    { selected: 'bg-rose-500/30 text-rose-700 border-rose-500 ring-rose-500', found: 'bg-rose-500 text-white border-rose-600 shadow-md' },
+    { selected: 'bg-blue-500/30 text-blue-300 border-blue-500 ring-blue-500', found: 'bg-blue-500 text-white border-blue-600 shadow-md' },
+    { selected: 'bg-purple-500/30 text-purple-300 border-purple-500 ring-purple-500', found: 'bg-purple-500 text-white border-purple-600 shadow-md' },
+    { selected: 'bg-pink-500/30 text-pink-300 border-pink-500 ring-pink-500', found: 'bg-pink-500 text-white border-pink-600 shadow-md' },
+    { selected: 'bg-orange-500/30 text-orange-300 border-orange-500 ring-orange-500', found: 'bg-orange-500 text-white border-orange-600 shadow-md' },
+    { selected: 'bg-cyan-500/30 text-cyan-300 border-cyan-500 ring-cyan-500', found: 'bg-cyan-500 text-white border-cyan-600 shadow-md' },
+    { selected: 'bg-indigo-500/30 text-indigo-300 border-indigo-500 ring-indigo-500', found: 'bg-indigo-500 text-white border-indigo-600 shadow-md' },
+    { selected: 'bg-teal-500/30 text-teal-300 border-teal-500 ring-teal-500', found: 'bg-teal-500 text-white border-teal-600 shadow-md' },
+    { selected: 'bg-rose-500/30 text-rose-300 border-rose-500 ring-rose-500', found: 'bg-rose-500 text-white border-rose-600 shadow-md' },
   ];
 
   const getColorForWordId = (wordId: string, isFound: boolean = false): string => {
@@ -492,6 +493,7 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
 
         {/* Progress */}
         <Progress value={progress} className="mb-4 md:mb-6 h-2" />
+        {lastFound && <p className="wordsearch-feedback" role="status">Found: {lastFound}</p>}
 
         {/* Word List - Compact display with only Oshikwanyama words */}
         {words.length > 0 ? (
@@ -510,14 +512,14 @@ export function WordSearchGame({ languageId, onBack }: WordSearchGameProps) {
                         ? (() => {
                             const index = words.findIndex(w => w.word.id === wordPos.word.id);
                             const foundColorClasses = [
-                              "bg-blue-500/20 border-blue-500 text-blue-700 line-through",
-                              "bg-purple-500/20 border-purple-500 text-purple-700 line-through",
-                              "bg-pink-500/20 border-pink-500 text-pink-700 line-through",
-                              "bg-orange-500/20 border-orange-500 text-orange-700 line-through",
-                              "bg-cyan-500/20 border-cyan-500 text-cyan-700 line-through",
-                              "bg-indigo-500/20 border-indigo-500 text-indigo-700 line-through",
-                              "bg-teal-500/20 border-teal-500 text-teal-700 line-through",
-                              "bg-rose-500/20 border-rose-500 text-rose-700 line-through",
+                              "bg-blue-500/20 border-blue-500 text-blue-300 line-through",
+                              "bg-purple-500/20 border-purple-500 text-purple-300 line-through",
+                              "bg-pink-500/20 border-pink-500 text-pink-300 line-through",
+                              "bg-orange-500/20 border-orange-500 text-orange-300 line-through",
+                              "bg-cyan-500/20 border-cyan-500 text-cyan-300 line-through",
+                              "bg-indigo-500/20 border-indigo-500 text-indigo-300 line-through",
+                              "bg-teal-500/20 border-teal-500 text-teal-300 line-through",
+                              "bg-rose-500/20 border-rose-500 text-rose-300 line-through",
                             ];
                             return foundColorClasses[index % foundColorClasses.length];
                           })()
