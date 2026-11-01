@@ -14,10 +14,11 @@ export async function buildOffline(directory = 'dist') {
     }
   }
   await walk('assets'); await walk('data');
+  const template = await readFile(new URL('./offline-worker.js', import.meta.url), 'utf8');
   const hash = createHash('sha256');
+  hash.update(template);
   for (const url of urls.sort()) { hash.update(url); hash.update(await readFile(path.join(directory, url.slice(1)))); }
   const version = hash.digest('hex').slice(0, 16);
-  const template = await readFile(new URL('./offline-worker.js', import.meta.url), 'utf8');
   await writeFile(path.join(directory, 'sw.js'), template.replace('__VERSION__', version).replace('__FILES__', JSON.stringify(urls)));
   console.log(`Offline release ${version}: ${urls.length} files`);
 }

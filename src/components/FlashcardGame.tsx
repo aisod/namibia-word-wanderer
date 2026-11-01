@@ -163,7 +163,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
 
   if (!selectedCategory) {
     return (
-      <div className="min-h-screen p-4 md:p-8">
+      <div className="game-screen">
         <div className="max-w-4xl mx-auto">
           <Button variant="ghost" onClick={onBack} className="mb-6">
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -213,10 +213,10 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
   const progress = cards.length > 0 ? ((learnedCards.size) / cards.length) * 100 : 0;
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="game-screen">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="game-header">
           <Button variant="ghost" onClick={() => setSelectedCategory(null)}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Categories
@@ -293,11 +293,12 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
 
         <p className="text-xs text-center text-muted-foreground mb-4"><a href="https://corpus.aisod.tech" target="_blank" rel="noopener noreferrer" className="underline">Powered by AISOD Corpus and its contributors</a></p>
         {/* Controls */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flashcard-controls">
           <Button
             variant="outline"
             size="icon"
             onClick={handlePrev}
+            aria-label="Previous word"
             disabled={currentIndex === 0}
           >
             <ChevronLeft className="w-5 h-5" />
@@ -321,6 +322,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
             variant="outline"
             size="icon"
             onClick={handleNext}
+            aria-label="Next word"
             disabled={currentIndex === cards.length - 1}
           >
             <ChevronRight className="w-5 h-5" />

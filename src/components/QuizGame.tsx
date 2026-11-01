@@ -32,6 +32,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
   const [lives, setLives] = useState(3);
   const [levelComplete, setLevelComplete] = useState(false);
   const [gameOver, setGameOver] = useState(false);
@@ -59,6 +60,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
     setSelectedAnswer(null);
     setIsAnswered(false);
     setScore(0);
+    setCorrectCount(0);
     setLives(3);
     setGameOver(false);
     setLevelComplete(false);
@@ -79,6 +81,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
     
     if (answer === currentQuestion.correctAnswer) {
       setScore(prev => prev + levelConfig.pointsPerWord);
+      setCorrectCount(prev => prev + 1);
     } else {
       const remaining = lives - 1;
       setLives(remaining);
@@ -191,7 +194,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
               <p className="text-sm text-muted-foreground">Score</p>
             </div>
             <div className="p-4 rounded-xl bg-secondary/50">
-              <p className="text-2xl font-bold text-foreground">{currentIndex}</p>
+              <p className="text-2xl font-bold text-foreground">{correctCount}</p>
               <p className="text-sm text-muted-foreground">Correct</p>
             </div>
           </div>
@@ -216,10 +219,10 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
   const progress = ((currentIndex) / questions.length) * 100;
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="game-screen">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="game-header">
           <Button variant="ghost" onClick={onBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
@@ -235,7 +238,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
               <Zap className="w-3 h-3 mr-1" />
               Total: {totalScore + score}
             </Badge>
-            <div className="flex gap-1">
+            <div className="flex gap-1" role="img" aria-label={`${lives} lives remaining`}>
               {[...Array(3)].map((_, i) => (
                 <Heart
                   key={i}
@@ -278,7 +281,7 @@ export function QuizGame({ languageId, onBack }: QuizGameProps) {
               key={option}
               onClick={() => handleAnswer(option)}
               className={cn(
-                "p-4 cursor-pointer transition-all duration-200 text-center font-medium",
+                "quiz-answer p-4 cursor-pointer transition-all duration-200 text-center font-medium",
                 !isAnswered && "hover:border-primary/50 hover:bg-primary/5",
                 isAnswered && option === currentQuestion.correctAnswer && "bg-success/20 border-success",
                 isAnswered && option === selectedAnswer && option !== currentQuestion.correctAnswer && "bg-destructive/20 border-destructive",

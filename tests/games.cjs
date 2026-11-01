@@ -43,14 +43,17 @@ async function main(){
     act(()=>answers[0].props.onClick());assert.ok(snapshot(renderer).includes('Next')||snapshot(renderer).includes('Continue'));checks++;
    }
    if(name==='WordMatchGame'){
-    const choices=()=>renderer.root.findAll(n=>n.type==='div'&&n.props.role==='button');
-    const englishChoices=choices().filter(n=>words.some(w=>w.english===n.children.join('')));
-    const english=englishChoices[0].children.join('');const translation=words.find(w=>w.english===english).oshikwanyama;
+    const choices=()=>renderer.root.findAll(n=>n.type==='button'&&n.props['data-match-side']);
+    const englishChoices=choices().filter(n=>n.props['data-match-side']==='english');
+    const english=englishChoices[0].props['data-word'];const translation=words.find(w=>w.english===english).oshikwanyama;
     act(()=>englishChoices[0].props.onClick());
-    act(()=>choices().find(n=>n.children.join('')===translation).props.onClick());
-    assert.equal(toastCount,1);checks++;
+    act(()=>choices().find(n=>n.props['data-match-side']==='native'&&n.props['data-word']===translation).props.onClick());
+    assert.equal(toastCount,0);assert.ok(snapshot(renderer).includes("Total: 10"));checks+=2;
+    assert.equal(choices().filter(n=>n.props.disabled).length,2,'Matched tiles must be disabled on both sides');checks++;
+    assert.ok(snapshot(renderer).includes('Matched:'),'Matching needs readable feedback');checks++;
+    assert.ok(choices().length<=12,'A round must not exceed six pairs');checks++;
     await act(async()=>{await new Promise(resolve=>setTimeout(resolve,550));});
-    assert.equal(toastCount,1);assert.ok(snapshot(renderer).length>20);checks+=2;toastCount=0;
+    assert.equal(toastCount,0);assert.ok(snapshot(renderer).includes("Total: 10"));checks+=2;toastCount=0;
    }
    if(name==='WordSearchGame'){
     const buttons=renderer.root.findAllByType('button').filter(b=>b.props['aria-label']?.startsWith('Row '));

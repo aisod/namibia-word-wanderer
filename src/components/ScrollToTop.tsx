@@ -5,15 +5,17 @@ import { useLocation } from "react-router-dom";
  * ScrollToTop component that scrolls to top of page on route change
  */
 export default function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, search, hash } = useLocation();
 
   useEffect(() => {
+    if (hash) return;
     window.scrollTo({
       top: 0,
       left: 0,
       behavior: "instant", // Use instant for immediate scroll, or "smooth" for animated
     });
-  }, [pathname]);
+  }, [pathname, search, hash]);
 
   return null;
 }
+

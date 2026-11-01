@@ -6,7 +6,7 @@ import { getLocalLanguage, resolveLanguageSlug } from "@/data/languageCatalog";
 import { shuffle, uniqueVocabulary } from "@/lib/vocabularyUtils";
 import type { VocabularyItem, CategoryInfo } from "@/lib/languageTypes";
 const EMPTY: VocabularyItem[] = [];
-const categoryNames: Record<string, string> = { animals: "Animals", body: "Body", family: "People & family", nature: "Nature", food: "Food", numbers: "Numbers", verbs: "Actions", everyday: "Everyday words", qualities: "Describing things", pronouns: "Pronouns", greetings: "Greetings", household: "Home & cooking", clothing: "Clothing" };
+const categoryNames: Record<string, string> = { people: "People", animals: "Animals", body: "Body", family: "People & family", nature: "Nature", food: "Food", numbers: "Numbers", verbs: "Actions", everyday: "Everyday words", qualities: "Describing things", pronouns: "Pronouns", greetings: "Greetings", household: "Home & cooking", clothing: "Clothing" };
 export function useLanguageData(languageSlug: string | undefined) {
   const slug = resolveLanguageSlug(languageSlug);
   const local = getLocalLanguage(slug);

@@ -18,6 +18,8 @@ export interface VocabularyItem {
 }
 
 export interface LanguageInfo {
+  family?: string;
+  geography?: string;
   name: string;
   nativeName: string;
   speakers: string;
