@@ -64,7 +64,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <span>{course?.name??"NAMQULA"}</span>
       {course ? <Link className="topbar-info" to={`/language/${course.slug}`} aria-label={`About ${course.name}`}><BookOpen aria-hidden="true"/></Link> : <span className="topbar-spacer"/>}
     </header>
-    <main id="app-content" className="app-content" tabIndex={-1}>{children}{location.pathname === "/" && <MobileSupport />}{!game && <footer className="corpus-credit"><a href="https://corpus.aisod.tech" target="_blank" rel="noopener noreferrer">AISOD Corpus of Language Data</a><p>With thanks to all its contributors. Preserving our languages, cultures and knowledge together.</p><a href="https://corpus.aisod.tech" target="_blank" rel="noopener noreferrer">Help grow the corpus</a></footer>}</main>
+    <main id="app-content" className="app-content" tabIndex={-1}>{children}<MobileSupport hidden={location.pathname !== "/"} />{!game && <footer className="corpus-credit"><a href="https://corpus.aisod.tech" target="_blank" rel="noopener noreferrer">AISOD Corpus of Language Data</a><p>With thanks to all its contributors. Preserving our languages, cultures and knowledge together.</p><a href="https://corpus.aisod.tech" target="_blank" rel="noopener noreferrer">Help grow the corpus</a></footer>}</main>
     <nav className="app-bottom-nav" aria-label="Main navigation">{links.map(({to,label,icon:Icon})=><Link key={label} to={to} aria-current={isActive(to)?"page":undefined}><Icon aria-hidden="true"/><span>{label}</span></Link>)}</nav>
   </div>;
 }

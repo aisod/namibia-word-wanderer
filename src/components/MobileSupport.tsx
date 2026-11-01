@@ -5,7 +5,7 @@ interface InstallPrompt extends Event {
   userChoice: Promise<{ outcome: string }>;
 }
 
-export function MobileSupport() {
+export function MobileSupport({ hidden = false }: { hidden?: boolean }) {
   const [online, setOnline] = useState(navigator.onLine);
   const [status, setStatus] = useState("Preparing offline play…");
   const [install, setInstall] = useState<InstallPrompt | null>(null);
@@ -52,6 +52,7 @@ export function MobileSupport() {
     if (!install) { setHelp(!help); return; }
     try { await install.prompt(); await install.userChoice; } finally { setInstall(null); }
   };
+  if (hidden) return null;
   return <section className="mobile-support" aria-label="Install and offline play">
     <div><strong>{online ? "Take NAMQULA with you" : "You’re offline"}</strong><p role="status">{status}</p>{!online && <p>Saved games work offline. Community and new downloads need internet.</p>}</div>
     {waiting && <button onClick={() => { applyingUpdate.current = true; waiting.postMessage("ACTIVATE_UPDATE"); }}>Update NAMQULA</button>}
