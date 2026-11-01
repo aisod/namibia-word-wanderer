@@ -35,13 +35,13 @@ export function Logo({ size = "md", className, showText = false, clickable = tru
   };
 
   return (
-    <div 
+    <div
       className={cn("flex items-center gap-3", clickable && "cursor-pointer transition-opacity hover:opacity-80", className)}
       onClick={handleClick}
     >
-      <img 
-        src="/logo.png" 
-        alt="NAMQULA Logo" 
+      <img
+        src="/logo.webp"
+        alt="NAMQULA Logo"
         className={cn(sizeClasses[size], "object-contain")}
       />
       {showText && (
@@ -52,3 +52,4 @@ export function Logo({ size = "md", className, showText = false, clickable = tru
     </div>
   );
 }
+

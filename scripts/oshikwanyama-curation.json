@@ -1,0 +1,506 @@
+[
+  [
+    "greetings",
+    8,
+    [
+      [
+        "Good morning",
+        "Wa lele po?"
+      ],
+      [
+        "Good afternoon",
+        "Wa uhala po?"
+      ],
+      [
+        "Good evening",
+        "Wa tokelwa po?"
+      ],
+      [
+        "Hello (informal)",
+        "Ongaipi"
+      ],
+      [
+        "Go well",
+        "Enda po nawa"
+      ],
+      [
+        "Stay well",
+        "Kala po nawa"
+      ],
+      [
+        "Sleep well (someone leaving for bed)",
+        "Ka nangale po nawa"
+      ],
+      [
+        "Sleep well (someone you are leaving)",
+        "Nangala po nawa"
+      ],
+      [
+        "OK",
+        "Eewa"
+      ]
+    ]
+  ],
+  [
+    "everyday",
+    8,
+    [
+      [
+        "Good",
+        "Nawa"
+      ],
+      [
+        "Morning",
+        "Ongula"
+      ],
+      [
+        "Afternoon (mid-day heat)",
+        "Omutenya"
+      ],
+      [
+        "Afternoon (late afternoon)",
+        "Komatango"
+      ],
+      [
+        "Evening",
+        "Onguloshi"
+      ],
+      [
+        "Night",
+        "Oufiku"
+      ]
+    ]
+  ],
+  [
+    "pronouns",
+    9,
+    [
+      [
+        "I",
+        "Ame"
+      ],
+      [
+        "You (singular)",
+        "Ove"
+      ],
+      [
+        "He / she",
+        "Ye"
+      ],
+      [
+        "We",
+        "Fye"
+      ],
+      [
+        "You (plural)",
+        "Nye"
+      ],
+      [
+        "They",
+        "Vo"
+      ]
+    ]
+  ],
+  [
+    "numbers",
+    10,
+    [
+      [
+        "One",
+        "Imwe"
+      ],
+      [
+        "Two",
+        "Mbali"
+      ],
+      [
+        "Three",
+        "Nhatu"
+      ],
+      [
+        "Four",
+        "Nhee"
+      ],
+      [
+        "Five",
+        "Nhano"
+      ],
+      [
+        "Six",
+        "Hamano"
+      ],
+      [
+        "Seven",
+        "Heyali"
+      ],
+      [
+        "Eight",
+        "Hetatu"
+      ],
+      [
+        "Nine",
+        "Omuwoi"
+      ],
+      [
+        "Ten",
+        "Omulongo"
+      ],
+      [
+        "One hundred",
+        "Efele"
+      ]
+    ]
+  ],
+  [
+    "food",
+    20,
+    [
+      [
+        "Meat",
+        "Ombelela"
+      ],
+      [
+        "Cabbage / spinach",
+        "Ombidi"
+      ],
+      [
+        "Dried spinach",
+        "Evanda"
+      ],
+      [
+        "Beef",
+        "Ombelela yongobe"
+      ],
+      [
+        "Soup",
+        "Oshopa"
+      ],
+      [
+        "Pasta",
+        "Omakoloni"
+      ],
+      [
+        "Rice",
+        "Olwiishi"
+      ],
+      [
+        "Oil",
+        "Omaadi"
+      ],
+      [
+        "Salt",
+        "Omongwa"
+      ],
+      [
+        "Fat cakes",
+        "Oukuki"
+      ],
+      [
+        "Flour",
+        "Oufila"
+      ],
+      [
+        "Sugar",
+        "Osuuka"
+      ],
+      [
+        "Millet",
+        "Omahangu"
+      ],
+      [
+        "Bread",
+        "Omboloto"
+      ],
+      [
+        "Jam",
+        "Ongema"
+      ],
+      [
+        "Butter",
+        "Ombuta"
+      ],
+      [
+        "Beans",
+        "Omakunde"
+      ],
+      [
+        "Tea",
+        "Otee"
+      ],
+      [
+        "Coffee",
+        "Okofi"
+      ],
+      [
+        "Cooldrink",
+        "Onamunate"
+      ]
+    ]
+  ],
+  [
+    "animals",
+    20,
+    [
+      [
+        "Goat",
+        "Oshikombo"
+      ],
+      [
+        "Chicken",
+        "Oxuxwa"
+      ],
+      [
+        "Dog",
+        "Ombwa"
+      ],
+      [
+        "Fish",
+        "Oshi"
+      ],
+      [
+        "Field mouse",
+        "Omhuku"
+      ],
+      [
+        "Frog",
+        "Efuma"
+      ]
+    ]
+  ],
+  [
+    "household",
+    20,
+    [
+      [
+        "Pot",
+        "Ombiya"
+      ],
+      [
+        "Bowl / basin",
+        "Oshiyaxa"
+      ],
+      [
+        "Plate",
+        "Okayaxa"
+      ],
+      [
+        "Traditional clay pot",
+        "Etiti"
+      ],
+      [
+        "Spoon",
+        "Olunguto"
+      ],
+      [
+        "Fork",
+        "Ofoloka"
+      ],
+      [
+        "Knife",
+        "Ombele"
+      ],
+      [
+        "Cooking stick",
+        "Oluko"
+      ],
+      [
+        "Fire",
+        "Omundilo"
+      ],
+      [
+        "Cooking fire",
+        "Ediko"
+      ],
+      [
+        "Match (for lighting a fire)",
+        "Okapalwa"
+      ]
+    ]
+  ],
+  [
+    "verbs",
+    21,
+    [
+      [
+        "To sleep",
+        "Okukofa"
+      ],
+      [
+        "To eat",
+        "Okulya"
+      ],
+      [
+        "To sing",
+        "Okwiimba"
+      ]
+    ]
+  ],
+  [
+    "family",
+    26,
+    [
+      [
+        "My father",
+        "Tate"
+      ],
+      [
+        "Your father",
+        "Xo"
+      ],
+      [
+        "His / her father",
+        "Xe"
+      ],
+      [
+        "My mother",
+        "Meme"
+      ],
+      [
+        "His / her mother",
+        "Ina"
+      ],
+      [
+        "My sibling",
+        "Omumwameme"
+      ],
+      [
+        "My brother",
+        "Omumwamememati"
+      ],
+      [
+        "My sister",
+        "Omumwamemekadona"
+      ],
+      [
+        "Your sibling",
+        "Omumwanyoko"
+      ],
+      [
+        "Younger brother or sister",
+        "Okandenge"
+      ],
+      [
+        "Child",
+        "Okaana"
+      ],
+      [
+        "First-born",
+        "Oshiveli"
+      ],
+      [
+        "Middle-born (neither first nor last)",
+        "Onowele"
+      ],
+      [
+        "Last-born",
+        "Onghelo"
+      ],
+      [
+        "Friend",
+        "Kaume"
+      ],
+      [
+        "Female friend",
+        "Kahewa"
+      ],
+      [
+        "Neighbour",
+        "Omushiinda"
+      ],
+      [
+        "Wife / woman",
+        "Omukulukadi"
+      ],
+      [
+        "Fiancé (man)",
+        "Omuvaleki"
+      ],
+      [
+        "Fiancée (woman)",
+        "Omuvalekwa"
+      ],
+      [
+        "Parents",
+        "Ovakulunhu"
+      ],
+      [
+        "Young person",
+        "Omunyasha"
+      ],
+      [
+        "Younger person (than you)",
+        "Omunini"
+      ],
+      [
+        "Elder person",
+        "Omukulunhu"
+      ]
+    ]
+  ],
+  [
+    "clothing",
+    60,
+    [
+      [
+        "Clothes",
+        "Oikutu"
+      ],
+      [
+        "T-shirt",
+        "Okambidja"
+      ],
+      [
+        "Shirt",
+        "Ohema"
+      ],
+      [
+        "Trousers",
+        "Ombulukweva"
+      ],
+      [
+        "Jersey / sweater",
+        "Ombidja"
+      ],
+      [
+        "Skirt",
+        "Ofulukweva"
+      ],
+      [
+        "Socks",
+        "Oikafino"
+      ],
+      [
+        "Hat",
+        "Embale"
+      ],
+      [
+        "Belt",
+        "Omuya"
+      ],
+      [
+        "Tie",
+        "Otae"
+      ],
+      [
+        "Watch",
+        "Ovili"
+      ],
+      [
+        "Bra",
+        "Okamanga"
+      ],
+      [
+        "Soap",
+        "Ofewa"
+      ],
+      [
+        "Clothesline",
+        "Ongodi yoikutu"
+      ],
+      [
+        "Clothespins",
+        "Oukalamala"
+      ]
+    ]
+  ]
+]

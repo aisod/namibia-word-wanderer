@@ -1,3 +1,4 @@
+import { VocabularyStatus } from "@/components/VocabularyStatus";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,7 +10,9 @@ import { ArrowLeft, ArrowRight, Users, MapPin, Globe, Lightbulb, BookOpen, Check
 export default function LanguageIntro() {
   const navigate = useNavigate();
   const { languageId } = useParams();
-  const { languageInfo, categories, isLoading } = useLanguageData(languageId);
+  const { languageInfo, categories, isLoading, error, retry } = useLanguageData(languageId);
+
+  if (error) return <VocabularyStatus error={error} onRetry={retry} onBack={() => navigate("/")} />;
 
   if (!languageInfo) {
     return (
@@ -150,6 +153,11 @@ export default function LanguageIntro() {
         </div>
       </section>
 
+      <section className="max-w-4xl mx-auto px-4 py-6 text-sm text-muted-foreground">
+        <h2 className="font-semibold text-foreground">About this starter pack</h2>
+        <p>A growing vocabulary collection for learning through play. Help us enrich and preserve our languages.</p>
+        <p className="mt-2"><a className="underline" href="https://corpus.aisod.tech" target="_blank" rel="noopener noreferrer">AISOD Corpus of Language Data and all its contributors</a></p>
+      </section>
       {/* CTA */}
       <section className="py-10 sm:py-16 md:py-24">
         <div className="px-4 sm:container sm:mx-auto">
@@ -161,7 +169,8 @@ export default function LanguageIntro() {
             <Button 
               size="lg" 
               className="relative text-sm sm:text-base md:text-lg px-6 sm:px-10 h-12 sm:h-14 md:h-16 text-white hover:opacity-90 active:scale-95 transition-transform overflow-hidden border-2 border-white/30 w-full sm:w-auto"
-              style={{ backgroundImage: 'url(/heroimage.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
+              style={{ backgroundImage: 'url(/heroimage.webp)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }}
+              disabled={isLoading || categories.length === 0}
               onClick={() => navigate(`/games/${languageId}`)}
             >
               <div className="absolute inset-0 bg-black/40" />
@@ -176,3 +185,4 @@ export default function LanguageIntro() {
     </div>
   );
 }
+

@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "NAMQULA \u2014 Learn through play",
+  "short_name": "NAMQULA",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0c1220",
+  "theme_color": "#0c1220",
+  "icons": [
+    {
+      "src": "/app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "description": "Learn African languages through play, online or offline. Powered by the AISOD Corpus of Language Data and its contributors.",
+  "orientation": "any"
+}

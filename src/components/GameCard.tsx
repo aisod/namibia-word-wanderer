@@ -37,6 +37,8 @@ const difficultyColors = {
 export function GameCard({ title, description, icon: Icon, iconImage, difficulty, onClick, color, className }: GameCardProps) {
   return (
     <Card
+      role="button" tabIndex={0}
+      onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } }}
       onClick={onClick}
       className={cn(
         "relative overflow-hidden p-4 sm:p-6 md:p-8 cursor-pointer",
@@ -85,3 +87,4 @@ export function GameCard({ title, description, icon: Icon, iconImage, difficulty
     </Card>
   );
 }
+

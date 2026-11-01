@@ -1,3 +1,4 @@
+import { VocabularyStatus } from "./VocabularyStatus";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,7 +15,7 @@ interface FlashcardGameProps {
 }
 
 export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
-  const { categories, getRandomVocabulary, isLoading } = useLanguageData(languageId);
+  const { categories, getRandomVocabulary, allVocabulary, isLoading, error, retry, languageInfo } = useLanguageData(languageId);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [level, setLevel] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
@@ -28,12 +29,8 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
 
   const startGame = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    const vocab = getRandomVocabulary(levelConfig.wordCount, categoryId === "all" ? undefined : categoryId);
-    setCards(vocab);
-    setCurrentIndex(0);
-    setIsFlipped(false);
-    setLearnedCards(new Set());
-    setLevelComplete(false);
+    setCards(getRandomVocabulary(levelConfig.wordCount, categoryId === "all" ? undefined : categoryId));
+    setCurrentIndex(0); setIsFlipped(false); setLearnedCards(new Set()); setLevelComplete(false);
   };
 
   useEffect(() => {
@@ -46,7 +43,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
       setLevelComplete(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [level, selectedCategory]);
+  }, [level]);
 
   const handleFlip = () => setIsFlipped(!isFlipped);
 
@@ -154,6 +151,8 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
     );
   }
 
+  if (!isLoading && (error || allVocabulary.length < 1)) return <VocabularyStatus error={error} onRetry={retry} onBack={onBack} />;
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -182,6 +181,8 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <Card
+              role="button" tabIndex={0} aria-label="Practise all words"
+              onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); startGame("all"); } }}
               onClick={() => startGame("all")}
               className="p-4 cursor-pointer game-card-hover hover:border-primary/50 border-2 border-transparent"
             >
@@ -192,6 +193,8 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
             {categories.map((cat) => (
               <Card
                 key={cat.id}
+                role="button" tabIndex={0} aria-label={`Practise ${cat.name}`}
+                onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); startGame(cat.id); } }}
                 onClick={() => startGame(cat.id)}
                 className="p-4 cursor-pointer game-card-hover hover:border-primary/50 border-2 border-transparent"
               >
@@ -241,6 +244,8 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
         {/* Flashcard */}
         <div 
           className="perspective-1000 cursor-pointer mb-8"
+          role="button" tabIndex={0} aria-label="Flip vocabulary card"
+          onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); handleFlip(); } }}
           onClick={handleFlip}
         >
           <div className={cn(
@@ -274,7 +279,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
               style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
             >
               <p className="text-sm text-muted-foreground mb-4 uppercase tracking-wide">
-                Oshikwanyama
+                {languageInfo?.name}
               </p>
               <h3 className="font-display text-3xl md:text-4xl text-primary text-center">
                 {currentCard?.oshikwanyama}
@@ -286,6 +291,7 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
           </div>
         </div>
 
+        <p className="text-xs text-center text-muted-foreground mb-4"><a href="https://corpus.aisod.tech" target="_blank" rel="noopener noreferrer" className="underline">Powered by AISOD Corpus and its contributors</a></p>
         {/* Controls */}
         <div className="flex items-center justify-between gap-4">
           <Button
@@ -324,3 +330,4 @@ export function FlashcardGame({ languageId, onBack }: FlashcardGameProps) {
     </div>
   );
 }
+
