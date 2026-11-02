@@ -28,7 +28,7 @@ export function MobileSupport({ hidden = false }: { hidden?: boolean }) {
     let cancelled = false;
     const hadController = !!navigator.serviceWorker.controller;
     const report = (message: string) => { if (!cancelled) setStatus(message); };
-    const check = (download = false) => {
+    const check = (download = true) => {
       const worker = navigator.serviceWorker.controller;
       if (!worker) return;
       const channel = new MessageChannel();
@@ -39,7 +39,7 @@ export function MobileSupport({ hidden = false }: { hidden?: boolean }) {
     navigator.serviceWorker.addEventListener("controllerchange", controllerChanged);
     report("Preparing offline play… Keep this app open and connected.");
     navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then(registration => {
-      check(attempt > 0);
+      check();
       const watch = (worker: ServiceWorker | null) => worker?.addEventListener("statechange", () => {
         if (worker.state === "redundant") report("Offline download failed. Check free storage and your connection, then retry.");
         if (worker.state === "installed" && navigator.serviceWorker.controller) { setWaiting(worker); report("A new version is ready when you are."); }

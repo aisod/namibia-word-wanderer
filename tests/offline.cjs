@@ -21,6 +21,8 @@ const { pathToFileURL } = require('node:url');
     let claimed=false; let skipped=false;
     vm.runInNewContext(source,{caches,Request:class {constructor(url){this.url=url;}},URL,fetch:async request=>{if(online) return 'network:'+request.url; throw Error('offline');},self:{async skipWaiting(){skipped=true;},location:{origin:'https://play.aisod.tech'},clients:{async claim(){claimed=true;}},addEventListener(name,handler){handlers[name]=handler;}}});
     let pending; handlers.install({waitUntil(promise){pending=promise;}}); await pending;
+    assert(skipped);
+    handlers.message({data:'PREPARE_OFFLINE',ports:[],waitUntil(promise){pending=promise;}}); await pending;
     stores.set('unrelated-cache',new Map()); stores.set('namqula-offline-oldest',new Map()); stores.set('namqula-offline-old',new Map([['/assets/old-game.js','old chunk']])); stores.set('namqula-offline-recent',new Map([['/index.html','previous app'],['/data/rukwangali.json','previous words']]));
     handlers.activate({waitUntil(promise){pending=promise;}}); await pending; assert(claimed); assert(stores.has('unrelated-cache')); assert(!stores.has('namqula-offline-oldest')); assert(stores.has('namqula-offline-old')); assert(skipped);
     async function request(url,mode='cors',method='GET') { let answer; handlers.fetch({request:{url,mode,method},respondWith(promise){answer=promise;}}); return answer; }
@@ -36,7 +38,7 @@ const { pathToFileURL } = require('node:url');
     handlers.message({data:'ACTIVATE_UPDATE',waitUntil(promise){pending=promise;}}); await pending; assert(skipped);
     await fs.writeFile(path.join(directory,'data/chokwe.json'),'updated'); await buildOffline(directory);
     assert.notEqual(source,await fs.readFile(path.join(directory,'sw.js'),'utf8'));
-    fail=true; stores.set('namqula-offline-previous',new Map()); handlers.install({waitUntil(promise){pending=promise;}}); await pending; assert(stores.has('namqula-offline-previous')); assert.equal(await status('OFFLINE_STATUS'),false);
+    fail=true; stores.set('namqula-offline-previous',new Map()); handlers.install({waitUntil(promise){pending=promise;}}); await pending; assert(stores.has('namqula-offline-previous')); assert.equal(await status('PREPARE_OFFLINE'),false); assert.equal(await status('OFFLINE_STATUS'),false);
     handlers.activate({waitUntil(promise){pending=promise;}}); await pending;
     online=true; assert.equal(await request('https://play.aisod.tech/words/chokwe','navigate'),'network:https://play.aisod.tech/words/chokwe');
     assert.equal(await request('https://play.aisod.tech/data/rukwangali.json'),'network:https://play.aisod.tech/data/rukwangali.json');

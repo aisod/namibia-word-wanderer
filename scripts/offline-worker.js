@@ -17,8 +17,9 @@ function prepareOffline() {
 }
 async function ready() { return !!(await (await caches.open(CACHE)).match('/index.html')); }
 self.addEventListener('install', event => {
-  // Online updates must remain usable even when offline storage is full.
-  event.waitUntil((async () => { await prepareOffline(); await self.skipWaiting(); })());
+  // Activate immediately: slow offline downloads must never hold an update hostage.
+  // The app requests PREPARE_OFFLINE once this worker controls the page.
+  event.waitUntil(self.skipWaiting());
 });
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
