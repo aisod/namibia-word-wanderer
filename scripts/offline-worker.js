@@ -1,31 +1,63 @@
 const CACHE = 'namqula-offline-__VERSION__';
 const FILES = __FILES__;
+let preparing;
+function prepareOffline() {
+  if (preparing) return preparing;
+  preparing = (async () => {
+    try {
+      const cache = await caches.open(CACHE);
+      await cache.addAll(FILES.map(url => new Request(url, { cache: 'reload' })));
+      return true;
+    } catch {
+      await caches.delete(CACHE);
+      return false;
+    } finally { preparing = undefined; }
+  })();
+  return preparing;
+}
+async function ready() { return !!(await (await caches.open(CACHE)).match('/index.html')); }
 self.addEventListener('install', event => {
-  event.waitUntil((async () => {
-    const cache = await caches.open(CACHE);
-    try { await cache.addAll(FILES.map(url => new Request(url, { cache: 'reload' }))); }
-    catch (error) { await caches.delete(CACHE); throw error; }
-  })());
+  // Online updates must remain usable even when offline storage is full.
+  event.waitUntil((async () => { await prepareOffline(); await self.skipWaiting(); })());
 });
-// Updates wait until existing app windows close, keeping lazy chunks consistent.
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
-    for (const key of await caches.keys()) if (key.startsWith('namqula-offline-') && key !== CACHE) await caches.delete(key);
+    if (await ready()) {
+      const previous = (await caches.keys()).filter(key => key.startsWith('namqula-offline-') && key !== CACHE);
+      // Retain previous hashed chunks for games already open in another tab.
+      for (const key of previous.slice(0, -2)) await caches.delete(key);
+    }
     await self.clients.claim();
   })());
 });
 self.addEventListener('message', event => {
   if (event.data === 'ACTIVATE_UPDATE') { event.waitUntil(self.skipWaiting()); return; }
-  if (event.data === 'OFFLINE_STATUS') event.ports[0]?.postMessage({ ready: true });
+  if (event.data === 'OFFLINE_STATUS' || event.data === 'PREPARE_OFFLINE') {
+    event.waitUntil((async () => {
+      const saved = event.data === 'PREPARE_OFFLINE' ? await prepareOffline() : await ready();
+      event.ports[0]?.postMessage({ ready: saved });
+    })());
+  }
 });
+async function cached(path) {
+  const previous = (await caches.keys()).filter(key => key.startsWith('namqula-offline-') && key !== CACHE).reverse();
+  for (const key of [CACHE, ...previous]) {
+    const response = await (await caches.open(key)).match(path);
+    if (response) return response;
+  }
+}
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET' || url.origin !== self.location.origin) return;
   // Never cache API responses, account pages or community submissions.
   if (event.request.mode === 'navigate') {
     if (url.pathname.startsWith('/admin') || url.pathname.startsWith('/community')) return;
-    event.respondWith(caches.open(CACHE).then(cache => cache.match('/index.html')));
-  } else if (FILES.includes(url.pathname)) {
-    event.respondWith(caches.open(CACHE).then(async cache => (await cache.match(url.pathname)) || fetch(event.request)));
+    event.respondWith((async () => {
+      if (await ready()) return (await caches.open(CACHE)).match('/index.html');
+      try { return await fetch(event.request); }
+      catch (error) { const fallback = await cached('/index.html'); if (fallback) return fallback; throw error; }
+    })());
+  } else if (FILES.includes(url.pathname) || url.pathname.startsWith('/assets/')) {
+    event.respondWith((async () => (await cached(url.pathname)) || fetch(event.request))());
   }
 });

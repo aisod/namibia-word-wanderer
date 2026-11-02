@@ -4,6 +4,6 @@ This is an installable progressive web app for Android and iPhone, rather than a
 
 Install: use the app installation button where supported. On iPhone, Safari > Share > Add to Home Screen. Wait for Ready for offline play, then try airplane mode and open every game in each language. Community submissions, admin operations and external corpus links require internet. No background submission queue or offline account access is claimed.
 
-Updates use a content-derived cache version. Existing app windows keep their version until closed, avoiding mixed lazy chunks. On reopening, the new installed release activates. API responses and private account data are not cached.
+Updates use a content-derived cache version and activate without interrupting an open game. The app offers a reload when a new controller takes over. Two previous caches retain hashed chunks for open games. If saving the new offline copy fails, online navigation still loads the current release and previous offline content remains a fallback. Retry download explicitly retries saving; readiness is checked against the current cache. API responses and private account data are not cached.
 
 All bundled records acknowledge AISOD Corpus of Language Data (https://corpus.aisod.tech) and all its contributors. Original authors, translators, sources and licence requirements remain intact. This does not claim that directly curated external records were downloaded from AISOD.
