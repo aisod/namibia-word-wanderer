@@ -54,10 +54,20 @@ self.addEventListener('fetch', event => {
     if (url.pathname.startsWith('/admin') || url.pathname.startsWith('/community')) return;
     event.respondWith((async () => {
       if (await ready()) return (await caches.open(CACHE)).match('/index.html');
-      try { return await fetch(event.request); }
+      try { return await fetch(event.request, { cache: 'reload' }); }
       catch (error) { const fallback = await cached('/index.html'); if (fallback) return fallback; throw error; }
     })());
   } else if (FILES.includes(url.pathname) || url.pathname.startsWith('/assets/')) {
-    event.respondWith((async () => (await cached(url.pathname)) || fetch(event.request))());
+    event.respondWith((async () => {
+      const current = await (await caches.open(CACHE)).match(url.pathname);
+      if (current) return current;
+      if (url.pathname.startsWith('/assets/')) {
+        const previousChunk = await cached(url.pathname);
+        if (previousChunk) return previousChunk;
+      }
+      // Unversioned packs must prefer the current server over an old offline copy.
+      try { return await fetch(event.request, { cache: 'reload' }); }
+      catch (error) { const fallback = await cached(url.pathname); if (fallback) return fallback; throw error; }
+    })());
   }
 });
