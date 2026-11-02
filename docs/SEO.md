@@ -20,3 +20,5 @@ Validation covers every generated page, unique titles, canonical/social metadata
 
 Public content credits AISOD Corpus of Language Data and all its contributors. Original provenance and rights remain in pack metadata and maintainer records.
 
+
+Installed-app updates activate before offline downloads begin. The controlled app requests saving in the background so a slow download cannot indefinitely delay a published release. Readiness is confirmed only after saving finishes.
