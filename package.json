@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/build-offline.mjs",
-    "build:dev": "vite build --mode development && node scripts/build-offline.mjs",
+    "build": "vite build && node scripts/build-seo.mjs && node scripts/build-offline.mjs",
+    "build:dev": "vite build --mode development && node scripts/build-seo.mjs && node scripts/build-offline.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node tests/vocabulary.cjs && node tests/games.cjs && node tests/progress.cjs && node tests/offline.cjs"
+    "test": "node tests/vocabulary.cjs && node tests/games.cjs && node tests/progress.cjs && node tests/offline.cjs && node tests/seo.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

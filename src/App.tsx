@@ -1,3 +1,4 @@
+import { RouteMetadata } from "./components/RouteMetadata";
 import { AppShell } from "./components/AppShell";
 import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
@@ -26,6 +27,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ScrollToTop />
+        <RouteMetadata />
         <AppShell>
         <PageTransition>
           <Suspense fallback={<div role="status" className="min-h-screen grid place-items-center">Loading page…</div>}>
