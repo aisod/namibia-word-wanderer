@@ -21,7 +21,7 @@ const { pathToFileURL } = require('node:url');
     let claimed=false; let skipped=false;
     vm.runInNewContext(source,{caches,Request:class {constructor(url){this.url=url;}},URL,fetch:async request=>{if(online) return 'network:'+request.url; throw Error('offline');},self:{async skipWaiting(){skipped=true;},location:{origin:'https://play.aisod.tech'},clients:{async claim(){claimed=true;}},addEventListener(name,handler){handlers[name]=handler;}}});
     let pending; handlers.install({waitUntil(promise){pending=promise;}}); await pending;
-    stores.set('unrelated-cache',new Map()); stores.set('namqula-offline-oldest',new Map()); stores.set('namqula-offline-old',new Map([['/assets/old-game.js','old chunk']])); stores.set('namqula-offline-recent',new Map([['/index.html','previous app']]));
+    stores.set('unrelated-cache',new Map()); stores.set('namqula-offline-oldest',new Map()); stores.set('namqula-offline-old',new Map([['/assets/old-game.js','old chunk']])); stores.set('namqula-offline-recent',new Map([['/index.html','previous app'],['/data/rukwangali.json','previous words']]));
     handlers.activate({waitUntil(promise){pending=promise;}}); await pending; assert(claimed); assert(stores.has('unrelated-cache')); assert(!stores.has('namqula-offline-oldest')); assert(stores.has('namqula-offline-old')); assert(skipped);
     async function request(url,mode='cors',method='GET') { let answer; handlers.fetch({request:{url,mode,method},respondWith(promise){answer=promise;}}); return answer; }
     assert.equal(await request('https://play.aisod.tech/games/chokwe','navigate'),'/index.html');
@@ -39,7 +39,8 @@ const { pathToFileURL } = require('node:url');
     fail=true; stores.set('namqula-offline-previous',new Map()); handlers.install({waitUntil(promise){pending=promise;}}); await pending; assert(stores.has('namqula-offline-previous')); assert.equal(await status('OFFLINE_STATUS'),false);
     handlers.activate({waitUntil(promise){pending=promise;}}); await pending;
     online=true; assert.equal(await request('https://play.aisod.tech/words/chokwe','navigate'),'network:https://play.aisod.tech/words/chokwe');
-    online=false; assert.equal(await request('https://play.aisod.tech/words/chokwe','navigate'),'previous app');
+    assert.equal(await request('https://play.aisod.tech/data/rukwangali.json'),'network:https://play.aisod.tech/data/rukwangali.json');
+    online=false; assert.equal(await request('https://play.aisod.tech/data/rukwangali.json'),'previous words'); assert.equal(await request('https://play.aisod.tech/words/chokwe','navigate'),'previous app');
     fail=false; assert(await status('PREPARE_OFFLINE')); assert.equal(await request('https://play.aisod.tech/words/chokwe','navigate'),'/index.html');
     for(const name of ['oshikwanyama','oshindonga','otjiherero','khoekhoegowab','chokwe','rukwangali']) for(const row of JSON.parse(await fs.readFile(`public/data/${name}.json`,'utf8'))) { assert.equal(row.corpusUrl,'https://corpus.aisod.tech'); assert(row.corpusAttribution.includes('all its contributors')); assert(row.sourceUrl); assert(row.license); }
     console.log('Offline caching, deep links, update isolation, failure recovery and all corpus credits passed');
